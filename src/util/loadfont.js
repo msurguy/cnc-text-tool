@@ -16,7 +16,7 @@ export default function parseFont(element) {
   const fontAscent = svgFontface.getAttribute('ascent');
   const fontUnitsPerEm = svgFontface.getAttribute('units-per-em') || 1000;
 
-  const EM = 16 // Unit for the height
+  const EM = 24 // Unit for the height
   const scale = EM / fontUnitsPerEm;
 
   each(svgGlyps, function (svgGlyph) {
@@ -26,7 +26,7 @@ export default function parseFont(element) {
     const name = svgGlyph.getAttribute('glyph-name') || ('glyph' + unicode);
     const width = svgGlyph.getAttribute('horiz-adv-x') || fontHorizAdvX;
 
-    result.push({
+    result[unicode] = {
       d: d ? new SvgPath(d)
         .translate(0, -fontAscent)
         .scale(scale, -scale)
@@ -35,12 +35,11 @@ export default function parseFont(element) {
         .rel()
         .round(2)
         .toString() : null,
-
       unicode: unicode,
       name: name,
       width: parseFloat((width * scale).toFixed(1)),
       height: EM
-    });
+    }
   });
 
   return result;
