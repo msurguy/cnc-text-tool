@@ -2,11 +2,9 @@ import each from 'lodash/each'
 import SvgPath from 'svgpath';
 // let XMLDOMParser = require('xmldom').DOMParser; use jsdom instead if used on server
 
-export default function parseFont(element) {
+export default function parseFont(element, size = 24) {
 
   let result = [];
-
-  // const element = (new XMLDOMParser()).parseFromString(data, "application/xml");
 
   const svgFont = element.getElementsByTagName('font')[0];
   const svgFontface = element.getElementsByTagName('font-face')[0];
@@ -16,7 +14,7 @@ export default function parseFont(element) {
   const fontAscent = svgFontface.getAttribute('ascent');
   const fontUnitsPerEm = svgFontface.getAttribute('units-per-em') || 1000;
 
-  const EM = 24 // Unit for the height
+  const EM = size // Unit for the height
   const scale = EM / fontUnitsPerEm;
 
   each(svgGlyps, function (svgGlyph) {
