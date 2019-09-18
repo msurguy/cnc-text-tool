@@ -7,8 +7,12 @@
         {{ option.text }}
       </option>
     </select>
+    <input type="range" name="font-size" min="10" max="200" step="1" v-model="fontSize">
     <svg width="6in" height="6in" id="canvas">
-      <path v-for="(path, index) in paths" :key="index" stroke-linejoin="round" stroke="#000" stroke-width="1px" fill="none" :d="path.d"></path>
+      <g id="line-text">
+        <path v-for="(path, index) in paths" :key="index" stroke-linejoin="round" stroke="#000" stroke-width="1px"
+              fill="none" :d="path.d"></path>
+      </g>
     </svg>
   </div>
 </template>
@@ -32,63 +36,100 @@
       text: 'Type Text Here',
       fonts: {
         'EMSAllure': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSElfin': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSFelix': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSNixish': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSNixishItalic': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSOsmotron': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSReadability': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSReadabilityItalic': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'EMSTech': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheyGothEnglish': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheySans1': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheySansMed': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheyScript1': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheyScriptMed': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheySerifBold': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheySerifBoldItalic': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheySerifMed': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         },
         'HersheySerifMedItalic': {
-          data: null
+          data: null,
+          string: '',
+          size: 24
         }
       },
       selectedFont: 'EMSAllure',
       fontOptions: [],
-      loadingFont: false
+      loadingFont: false,
+      fontSize: 24
     }
   },
     watch: {
@@ -97,6 +138,9 @@
       },
       loadingFont (newValue, oldValue) {
         if (oldValue === true && newValue === false) this.convert()
+      },
+      fontSize () {
+        this.loadFont()
       }
     },
     mounted() {
@@ -108,15 +152,21 @@
     methods: {
     async loadFont () {
       this.loadingFont = true
-      if (this.fonts[this.selectedFont].data) {
+      if (this.fonts[this.selectedFont].data && (this.fontSize === this.fonts[this.selectedFont].fontSize)) {
         this.$nextTick(function () {
           this.loadingFont = false
         })
         return
       }
-      const fontString = await this.loadFontFromURL(`${FONT_URL_ROOT}${this.selectedFont}.svg`)
-      this.loadingFont = false
-      this.fonts[this.selectedFont].data = parseFont(new DOMParser().parseFromString(fontString, "image/svg+xml"), 48)
+      if (!this.fonts[this.selectedFont].data) {
+        const fontString = await this.loadFontFromURL(`${FONT_URL_ROOT}${this.selectedFont}.svg`)
+        this.fonts[this.selectedFont].string = fontString
+      }
+      this.fonts[this.selectedFont].data = parseFont(new DOMParser().parseFromString(this.fonts[this.selectedFont].string, "image/svg+xml"), this.fontSize)
+      this.fonts[this.selectedFont].fontSize = this.fontSize
+      this.$nextTick(function () {
+        this.loadingFont = false
+      })
     },
     async loadFontFromURL(url) {
       let { data } = await this.axios.get(url)
