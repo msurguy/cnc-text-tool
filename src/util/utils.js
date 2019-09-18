@@ -1,31 +1,3 @@
-export function pointsToPath(points, scale = 1, closed = false) {
-  let svgpath = '', i, j;
-  for (i = 0; i < points.length; i++) {
-    for (j = 0; j < points[i].length; j++) {
-      if (!j) svgpath += 'M';
-      else svgpath += 'L';
-      svgpath += (points[i][j].X / scale) + ', ' + (points[i][j].Y / scale);
-    }
-    if (closed) svgpath += 'Z';
-  }
-  if (svgpath === "") svgpath = "M0,0";
-  return svgpath;
-}
-
-
-export function createPolygon(x, y, numOfSides, radius, minAngle) {
-  let points = ''
-  let xo
-  let yo
-  for (let i = 0; i < numOfSides; i++) {
-    let t = (Math.PI * 2 / numOfSides * i) + minAngle * (Math.PI / 180)
-    xo = x + radius * Math.sin(t)
-    yo = y + radius * Math.cos(t)
-    points += xo + ',' + yo + ' '
-  }
-  return points
-}
-
 export function downloadSVG(element, fileName) {
   const svgDoctype = '<?xml version="1.0" standalone="no"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
 

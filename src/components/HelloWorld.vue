@@ -1,253 +1,459 @@
 <template>
-  <div class="hello">
-    <input type="text" v-model="text">
-    <button @click.prevent="convert">Convert Text</button>
-    <select v-model="selectedFont">
-      <option v-for="option in fontOptions" :key="option.value" :value="option.value">
-        {{ option.text }}
-      </option>
-    </select>
-    <input type="range" name="font-size" min="10" max="200" step="1" v-model="fontSize">
-    <svg width="6in" height="6in" id="canvas">
-      <g id="line-text">
-        <path v-for="(path, index) in paths" :key="index" stroke-linejoin="round" stroke="#000" stroke-width="1px"
-              fill="none" :d="path.d"></path>
-      </g>
-    </svg>
-  </div>
+    <div class="page">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="controls-wrapper">
+                <div class="controls">
+                    <p class="mt-3 lead text-center text-white"> Source </p>
+                    <div class="sidebar-control">
+                        <div class="control-header">
+                            <div></div>
+                            <div class="control-label">
+                                Upload File
+                            </div>
+                            <div></div>
+                        </div>
+                        <div class="custom-file">
+                            <input @change="onSourceFileChange" type="file" accept="image/svg+xml"
+                                   class="custom-file-input"
+                                   id="sourcefile">
+                            <label class="custom-file-label" for="sourcefile">Choose file</label>
+                        </div>
+                    </div>
+
+                    <div class="progress" v-if="source.loading">
+                        <div class="progress-bar" role="progressbar"
+                             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Loading SVG
+                        </div>
+                    </div>
+
+                    <transition name="slide">
+                        <div v-if="source.svg">
+                            <text-input label="Input String" @reset="resetTextInput"
+                                        :value="text" @input="updateText"></text-input>
+                            <select-field label="Font" v-model="font.selected"
+                                          :options="fontOptions"></select-field>
+                        </div>
+                    </transition>
+
+                </div>
+            </div>
+
+            <div class="button">
+                <div class="reveal"></div>
+                <button class="btn btn-primary btn-block" @click.prevent="download">
+                    Download SVG
+                </button>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="paper">
+            <div id="sketch" class="sketch">
+                <div id="svg-wrapper" ref="svgWrapper">
+
+                </div>
+            </div>
+        </div>
+        <div class="footer-wrapper">
+            <div class="footer">
+                <h1>Line Text</h1>
+                <p>Project by <a target="_blank" href="http://twitter.com/msurguy">@msurguy</a> (<a target="_blank"
+                                                                                                    href="http://github.com/msurguy/svg-cropper">Source</a>)
+                </p>
+            </div>
+        </div>
+    </div>
+
 </template>
 
 <script>
+  import bsCustomFileInput from 'bs-custom-file-input'
+
+  import debounce from 'lodash.debounce'
+
+  import Toggle from "@/components/Toggle";
+  import SelectField from "@/components/SelectField";
+  import Slider from "@/components/Slider";
+  import ButtonGroup from "@/components/ButtonGroup";
+  import TextInput from "@/components/TextInput";
+
   import parseFont from "@/util/loadfont";
   import SvgPath from 'svgpath';
 
   import he from 'he'
+  import {downloadSVG} from "@/util/utils";
 
   const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/hershey-text/raw/master/hershey-text/svg_fonts/'
 
   export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  },
-  data() {
-    return {
-      paths: [],
-      text: 'Type Text Here',
-      fonts: {
-        'EMSAllure': {
-          data: null,
-          string: '',
-          size: 24
+    name: 'HelloWorld',
+    components: {
+      Toggle,
+      SelectField,
+      Slider,
+      ButtonGroup,
+      TextInput
+    },
+    props: {
+      msg: String
+    },
+    data() {
+      return {
+        source: {
+          name: '',
+          svg: '',
+          loading: false
         },
-        'EMSElfin': {
-          data: null,
-          string: '',
-          size: 24
+        paths: [],
+        text: 'Type Text Here',
+        fonts: {
+          'EMSAllure': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSElfin': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSFelix': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSNixish': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSNixishItalic': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSOsmotron': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSReadability': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSReadabilityItalic': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'EMSTech': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheyGothEnglish': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheySans1': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheySansMed': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheyScript1': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheyScriptMed': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheySerifBold': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheySerifBoldItalic': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheySerifMed': {
+            data: null,
+            string: '',
+            size: 24
+          },
+          'HersheySerifMedItalic': {
+            data: null,
+            string: '',
+            size: 24
+          }
         },
-        'EMSFelix': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'EMSNixish': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'EMSNixishItalic': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'EMSOsmotron': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'EMSReadability': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'EMSReadabilityItalic': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'EMSTech': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheyGothEnglish': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheySans1': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheySansMed': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheyScript1': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheyScriptMed': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheySerifBold': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheySerifBoldItalic': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheySerifMed': {
-          data: null,
-          string: '',
-          size: 24
-        },
-        'HersheySerifMedItalic': {
-          data: null,
-          string: '',
-          size: 24
+        fontOptions: [],
+        font: {
+          selected: 'EMSAllure',
+          size: 24,
+          loading: false
         }
-      },
-      selectedFont: 'EMSAllure',
-      fontOptions: [],
-      loadingFont: false,
-      fontSize: 24
-    }
-  },
+      }
+    },
     watch: {
-      selectedFont () {
+      'font.selected'() {
         this.loadFont()
       },
-      loadingFont (newValue, oldValue) {
+      'font.loading'(newValue, oldValue) {
         if (oldValue === true && newValue === false) this.convert()
       },
-      fontSize () {
+      'font.size'() {
         this.loadFont()
       }
     },
     mounted() {
+      bsCustomFileInput.init()
+
       this.fontOptions = Object.keys(this.fonts).map((fontName) => {
-        return { text: fontName, value: fontName}
+        return {text: fontName, value: fontName}
       })
       this.loadFont()
     },
     methods: {
-    async loadFont () {
-      this.loadingFont = true
-      if (this.fonts[this.selectedFont].data && (this.fontSize === this.fonts[this.selectedFont].fontSize)) {
-        this.$nextTick(function () {
-          this.loadingFont = false
-        })
+      updateText: debounce(function (e) {
+        this.text = e
+        console.log(e)
+      }, 300),
+      resetTextInput() {
+        this.text = ''
         return
-      }
-      if (!this.fonts[this.selectedFont].data) {
-        const fontString = await this.loadFontFromURL(`${FONT_URL_ROOT}${this.selectedFont}.svg`)
-        this.fonts[this.selectedFont].string = fontString
-      }
-      this.fonts[this.selectedFont].data = parseFont(new DOMParser().parseFromString(this.fonts[this.selectedFont].string, "image/svg+xml"), this.fontSize)
-      this.fonts[this.selectedFont].fontSize = this.fontSize
-      this.$nextTick(function () {
-        this.loadingFont = false
-      })
-    },
-    async loadFontFromURL(url) {
-      let { data } = await this.axios.get(url)
-      // Remove anything before first <svg
-      let firstOccurenceOfSVG = data.indexOf('<svg ')
-      if (firstOccurenceOfSVG === -1) {
-        firstOccurenceOfSVG = data.indexOf('<SVG ')
-      }
+      },
+      onSourceFileChange(e) {
+        this.source.loading = true
 
-      // Remove everything that occurs prior to SVG opening tag
-      data = data.substring(firstOccurenceOfSVG)
-      return data
-    },
-    convert() {
-      this.paths = []
-      const fontData = this.fonts[this.selectedFont].data
-      const inputString = this.text
+        // reset position / scale / other params of the text
 
-      // Generate SVGs in a grid inside of SVG file
+        let files = e.target.files || e.dataTransfer.files;
+        if (!files.length)
+          return;
+        this.readSourceImage(files[0]);
+      },
+      readSourceImage(file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          // Set file name
+          this.source.name = file.name.substr(0, file.name.lastIndexOf('.'))
 
-      let originX = 0
-      let originY = 0
+          // try finding "<svg" in the document:
+          let fileContents = e.target.result
 
+          let firstOccurenceOfSVG = fileContents.indexOf('<svg ')
 
-      let characters = inputString.split('')
-
-      characters.forEach((character) => {
-
-        let encodedCharacter = he.encode(character)
-        if (character === ' ') encodedCharacter = ' '
-        if (character === '&') encodedCharacter = '&'
-        if (character === '\'') encodedCharacter = '&apos;'
-
-        if (encodedCharacter.length > 2) encodedCharacter = encodedCharacter.toLowerCase()
-
-        if (fontData[encodedCharacter]) {
-          if (fontData[encodedCharacter].d) {
-            this.paths.push({
-              d: new SvgPath(fontData[encodedCharacter].d)
-                      .translate(originX, originY)
-                      //.rotate(-10)
-                      //.skew()
-                      //.skewY(10)
-                      // .abs()
-                      // .round(2)
-                      .rel()
-                      .round(2)
-                      .toString()
-            })
+          if (firstOccurenceOfSVG === -1) {
+            firstOccurenceOfSVG = fileContents.indexOf('<SVG ')
           }
-          originX += fontData[encodedCharacter].width
+
+          // Remove everything that occurs prior to SVG opening tag
+          fileContents = fileContents.substring(firstOccurenceOfSVG)
+          this.$refs.svgWrapper.innerHTML = fileContents
+          this.source.svg = fileContents //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+          this.source.loading = false
+        };
+        reader.readAsText(file);
+      },
+      async loadFont() {
+        this.font.loading = true
+        if (this.fonts[this.font.selected].data && (this.font.size === this.fonts[this.font.selected].size)) {
+          this.$nextTick(function () {
+            this.font.loading = false
+          })
+          return
         }
-      })
+        if (!this.fonts[this.font.selected].data) {
+          this.fonts[this.font.selected].string = await this.loadFontFromURL(`${FONT_URL_ROOT}${this.font.selected}.svg`)
+        }
+        this.fonts[this.font.selected].data = parseFont(new DOMParser().parseFromString(this.fonts[this.font.selected].string, "image/svg+xml"), this.font.size)
+        this.fonts[this.font.selected].size = this.font.size
+        this.$nextTick(function () {
+          this.font.loading = false
+        })
+      },
+      async loadFontFromURL(url) {
+        let {data} = await this.axios.get(url)
+        // Remove anything before first <svg
+        let firstOccurenceOfSVG = data.indexOf('<svg ')
+        if (firstOccurenceOfSVG === -1) {
+          firstOccurenceOfSVG = data.indexOf('<SVG ')
+        }
+
+        // Remove everything that occurs prior to SVG opening tag
+        data = data.substring(firstOccurenceOfSVG)
+        return data
+      },
+      download() {
+        downloadSVG(this.$refs.svgWrapper.firstChild, `line-text-${Date.now()}`)
+      },
+      convert() {
+        this.paths = []
+        const fontData = this.fonts[this.font.selected].data
+        const inputString = this.text
+
+        // Generate SVGs in a grid inside of SVG file
+
+        let originX = 0
+        let originY = 0
+
+
+        let characters = inputString.split('')
+
+        characters.forEach((character) => {
+
+          let encodedCharacter = he.encode(character)
+          if (character === ' ') encodedCharacter = ' '
+          if (character === '&') encodedCharacter = '&'
+          if (character === '\'') encodedCharacter = '&apos;'
+
+          if (encodedCharacter.length > 2) encodedCharacter = encodedCharacter.toLowerCase()
+
+          if (fontData[encodedCharacter]) {
+            if (fontData[encodedCharacter].d) {
+              this.paths.push({
+                d: new SvgPath(fontData[encodedCharacter].d)
+                  .translate(originX, originY)
+                  //.rotate(-10)
+                  //.skew()
+                  //.skewY(10)
+                  // .abs()
+                  // .round(2)
+                  .rel()
+                  .round(2)
+                  .toString()
+              })
+            }
+            originX += fontData[encodedCharacter].width
+          }
+        })
+      }
     }
   }
-}
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+    .page {
+        position: relative;
+        height: 100%;
+        display: flex;
+    }
 
-  .hello {
-    margin: 0;
-    padding: 0;
-  }
+    .controls {
+        width: 100%;
+        margin-bottom: 50px;
+    }
 
-  #canvas {
-    display: block;
-  }
+    .controls-wrapper {
+        max-height: 100vh;
+        overflow: scroll;
+    }
+
+    .button {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .reveal {
+        display: block;
+        height: 15px;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgb(47, 47, 47) 100%);
+    }
+
+    .paper {
+        padding: 10px;
+        background-color: #dedede;
+        position: relative;
+        max-height: 100vh;
+        width: calc(100% - 300px);
+        overflow: scroll;
+        z-index: 1;
+    }
+
+    .sketch {
+        position: relative;
+        overflow: auto;
+    }
+
+    #svg-wrapper {
+        display: inline-block;
+        border: 1px dashed #000;
+    }
+
+    .sidebar {
+        z-index: 10;
+        width: 300px;
+        position: relative;
+    }
+
+    .footer-wrapper {
+        z-index: 1000;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        color: #2D2D2D;
+    }
+
+    .footer {
+        padding: 15px 15px 0 15px;
+        text-align: right;
+    }
+
+    @media (max-width: 767px) {
+        .page {
+            flex-direction: column;
+        }
+
+        .controls-wrapper {
+            max-height: none;
+        }
+
+        .sidebar {
+            width: 100%;
+        }
+
+        .paper {
+            width: 100%;
+            max-height: none;
+        }
+
+        .footer-wrapper {
+            position: relative;
+            background-color: #CCC;
+        }
+    }
+
+    .slide-enter-active,
+    .slide-leave-active {
+        transition: all 300ms ease-in-out;
+    }
+
+    .slide-enter-to,
+    .slide-leave {
+        max-height: 200px;
+        opacity: 1;
+        overflow: hidden;
+    }
+
+    .slide-enter,
+    .slide-leave-to {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+    }
 </style>
