@@ -77,7 +77,8 @@
   // import Slider from "@/components/Slider";
   // import ButtonGroup from "@/components/ButtonGroup";
   import TextInput from "@/components/TextInput";
-  import * as SVG from 'svg.js'
+  import {SVG} from "@svgdotjs/svg.js";
+  import '@svgdotjs/svg.draggable.js'
 
   import parseFont from "@/util/loadfont";
   import SvgPath from 'svgpath';
@@ -234,7 +235,7 @@
         this.overlay.textGroup.clear()
         paths.forEach((path) => {
           let svgPath = this.overlay.textGroup.path(path.d)
-          svgPath.fill('none').stroke({width: 1})
+          svgPath.fill('none').stroke({width: 1, color: '#000', linecap: 'join'})
         })
       }
     },
@@ -242,9 +243,12 @@
       bsCustomFileInput.init()
 
       // Reset the SVG container
-      this.overlay.svg = SVG(document.getElementById('svg-wrapper')).addClass('canvas')
+      this.overlay.svg = SVG().addTo('#svg-wrapper').addClass('canvas')
       this.overlay.svg.size(0,0)
       this.overlay.textGroup = this.overlay.svg.group()
+      this.overlay.textGroup.draggable().on('dragmove', (e) => {
+        console.log(e)
+      })
 
       this.fontOptions = Object.keys(this.fonts).map((fontName) => {
         return {text: fontName, value: fontName}
