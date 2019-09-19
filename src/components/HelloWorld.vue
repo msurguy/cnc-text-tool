@@ -33,6 +33,7 @@
                                         :value="text" @input="updateText"></text-input>
                             <select-field label="Font" v-model="font.selected"
                                           :options="fontOptions"></select-field>
+                            <toggle label="Black / White" v-model="font.color"></toggle>
                         </div>
                     </transition>
 
@@ -51,7 +52,6 @@
         <div class="paper">
             <div id="sketch" class="sketch">
                 <div id="svg-wrapper" ref="svgWrapper">
-
                 </div>
             </div>
         </div>
@@ -74,9 +74,10 @@
 
   import Toggle from "@/components/Toggle";
   import SelectField from "@/components/SelectField";
-  import Slider from "@/components/Slider";
-  import ButtonGroup from "@/components/ButtonGroup";
+  // import Slider from "@/components/Slider";
+  // import ButtonGroup from "@/components/ButtonGroup";
   import TextInput from "@/components/TextInput";
+  import * as SVG from 'svg.js'
 
   import parseFont from "@/util/loadfont";
   import SvgPath from 'svgpath';
@@ -91,8 +92,8 @@
     components: {
       Toggle,
       SelectField,
-      Slider,
-      ButtonGroup,
+     // Slider,
+     // ButtonGroup,
       TextInput
     },
     props: {
@@ -103,7 +104,18 @@
         source: {
           name: '',
           svg: '',
-          loading: false
+          string: '',
+          loading: false,
+          width: 0,
+          height: 0,
+          viewbox: '0 0 0 0'
+        },
+        overlay: {
+          width: 0,
+          height: 0,
+          viewbox: '0 0 0 0',
+          svg: null,
+          textGroup: null
         },
         paths: [],
         text: 'Type Text Here',
@@ -203,6 +215,7 @@
         font: {
           selected: 'EMSAllure',
           size: 24,
+          color: false,
           loading: false
         }
       }
@@ -216,10 +229,22 @@
       },
       'font.size'() {
         this.loadFont()
+      },
+      paths (paths) {
+        this.overlay.textGroup.clear()
+        paths.forEach((path) => {
+          let svgPath = this.overlay.textGroup.path(path.d)
+          svgPath.fill('none').stroke({width: 1})
+        })
       }
     },
     mounted() {
       bsCustomFileInput.init()
+
+      // Reset the SVG container
+      this.overlay.svg = SVG(document.getElementById('svg-wrapper')).addClass('canvas')
+      this.overlay.svg.size(0,0)
+      this.overlay.textGroup = this.overlay.svg.group()
 
       this.fontOptions = Object.keys(this.fonts).map((fontName) => {
         return {text: fontName, value: fontName}
@@ -229,7 +254,7 @@
     methods: {
       updateText: debounce(function (e) {
         this.text = e
-        console.log(e)
+        this.convert()
       }, 300),
       resetTextInput() {
         this.text = ''
@@ -262,8 +287,32 @@
 
           // Remove everything that occurs prior to SVG opening tag
           fileContents = fileContents.substring(firstOccurenceOfSVG)
-          this.$refs.svgWrapper.innerHTML = fileContents
-          this.source.svg = fileContents //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+          this.source.string = fileContents //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+
+          const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+
+          if (this.$refs.svgWrapper.childNodes[1]) {
+            this.$refs.svgWrapper.removeChild(this.$refs.svgWrapper.childNodes[1])
+          }
+          this.$refs.svgWrapper.appendChild(svgElement)
+
+          // Grab Width, Height and Viewbox attributes:
+          this.source.width = svgElement.getAttribute('width')
+          this.source.height = svgElement.getAttribute('height')
+          this.source.viewbox = svgElement.getAttribute('viewBox')
+
+          this.overlay.width = this.source.width
+          this.overlay.height = this.source.height
+          this.overlay.viewbox = this.source.viewbox
+
+          const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
+
+          this.overlay.svg.size(this.overlay.width, this.overlay.height)
+          this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3])
+
+          this.overlay.svg.rect(100, 100).fill('#f06').move(20, 20)
+
+          this.source.svg = svgElement //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
           this.source.loading = false
         };
         reader.readAsText(file);
@@ -387,10 +436,11 @@
 
     .sketch {
         position: relative;
-        overflow: auto;
+        /*overflow: auto;*/
     }
 
     #svg-wrapper {
+        position: relative;
         display: inline-block;
         border: 1px dashed #000;
     }

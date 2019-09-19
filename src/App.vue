@@ -19,4 +19,10 @@ export default {
 #app {
   height: 100%;
 }
+
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
 </style>
