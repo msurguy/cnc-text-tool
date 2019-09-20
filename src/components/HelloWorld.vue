@@ -33,6 +33,8 @@
                                         :value="text" @input="updateText"></text-input>
                             <select-field label="Font" v-model="font.selected"
                                           :options="fontOptions"></select-field>
+                            <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.size"></slider>
+                            <slider :min="-360" :max="360" :step="1" label="Rotation" v-model.number="overlay.rotation"></slider>
                             <toggle label="Black / White" v-model="font.color"></toggle>
                         </div>
                     </transition>
@@ -74,11 +76,11 @@
 
   import Toggle from "@/components/Toggle";
   import SelectField from "@/components/SelectField";
-  // import Slider from "@/components/Slider";
+  import Slider from "@/components/Slider";
   // import ButtonGroup from "@/components/ButtonGroup";
   import TextInput from "@/components/TextInput";
   import {SVG} from "@svgdotjs/svg.js";
-  import '@svgdotjs/svg.draggable.js'
+  import '@/lib/svg.draggable'
 
   import parseFont from "@/util/loadfont";
   import SvgPath from 'svgpath';
@@ -93,7 +95,7 @@
     components: {
       Toggle,
       SelectField,
-     // Slider,
+      Slider,
      // ButtonGroup,
       TextInput
     },
@@ -116,7 +118,10 @@
           height: 0,
           viewbox: '0 0 0 0',
           svg: null,
-          textGroup: null
+          textGroup: null,
+          x: 0,
+          y: 0,
+          rotation: 0
         },
         paths: [],
         text: 'Type Text Here',
@@ -231,12 +236,20 @@
       'font.size'() {
         this.loadFont()
       },
+      'font.color'(){
+        this.convert()
+      },
+      'overlay.rotation'(degrees) {
+        this.overlay.textGroup.transform({rotate: degrees}, false)
+      },
       paths (paths) {
         this.overlay.textGroup.clear()
         paths.forEach((path) => {
-          let svgPath = this.overlay.textGroup.path(path.d)
-          svgPath.fill('none').stroke({width: 1, color: '#000', linecap: 'join'})
+          this.overlay.textGroup.path(path.d).fill('none').stroke({width: 1, color: this.font.color ? '#FFFFFF' : '#000000', linecap: 'join'})
         })
+        const {x, y, width, height} = this.overlay.textGroup.bbox()
+        this.overlay.textGroup.rect(width, height).fill('#FFF').opacity(0).move(x, y)
+        this.overlay.textGroup.move(this.overlay.x, this.overlay.y)
       }
     },
     mounted() {
@@ -247,7 +260,8 @@
       this.overlay.svg.size(0,0)
       this.overlay.textGroup = this.overlay.svg.group()
       this.overlay.textGroup.draggable().on('dragmove', (e) => {
-        console.log(e)
+        this.overlay.x = e.detail.box.x
+        this.overlay.y = e.detail.box.y
       })
 
       this.fontOptions = Object.keys(this.fonts).map((fontName) => {
@@ -309,12 +323,12 @@
           this.overlay.height = this.source.height
           this.overlay.viewbox = this.source.viewbox
 
-          const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
-
           this.overlay.svg.size(this.overlay.width, this.overlay.height)
-          this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3])
 
-          this.overlay.svg.rect(100, 100).fill('#f06').move(20, 20)
+          if (this.source.viewbox) {
+            const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
+            this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3])
+          }
 
           this.source.svg = svgElement //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
           this.source.loading = false
@@ -380,7 +394,7 @@
               this.paths.push({
                 d: new SvgPath(fontData[encodedCharacter].d)
                   .translate(originX, originY)
-                  //.rotate(-10)
+                  //.rotate(this.overlay.rotation)
                   //.skew()
                   //.skewY(10)
                   // .abs()
