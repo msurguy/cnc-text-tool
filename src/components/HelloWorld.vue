@@ -79,7 +79,7 @@
   import Slider from "@/components/Slider";
   // import ButtonGroup from "@/components/ButtonGroup";
   import TextInput from "@/components/TextInput";
-  import {SVG} from "@svgdotjs/svg.js";
+  import {SVG, Matrix} from "@svgdotjs/svg.js";
   import '@/lib/svg.draggable'
 
   import parseFont from "@/util/loadfont";
@@ -119,6 +119,7 @@
           viewbox: '0 0 0 0',
           svg: null,
           textGroup: null,
+          flattened: null,
           x: 0,
           y: 0,
           rotation: 0
@@ -231,13 +232,13 @@
         this.loadFont()
       },
       'font.loading'(newValue, oldValue) {
-        if (oldValue === true && newValue === false) this.convert()
+        if (oldValue === true && newValue === false) this.createTextPaths()
       },
       'font.size'() {
         this.loadFont()
       },
       'font.color'(){
-        this.convert()
+        this.createTextPaths()
       },
       'overlay.rotation'(degrees) {
         this.overlay.textGroup.transform({rotate: degrees}, false)
@@ -272,7 +273,7 @@
     methods: {
       updateText: debounce(function (e) {
         this.text = e
-        this.convert()
+        this.createTextPaths()
       }, 300),
       resetTextInput() {
         this.text = ''
@@ -365,9 +366,38 @@
         return data
       },
       download() {
-        downloadSVG(this.$refs.svgWrapper.firstChild, `line-text-${Date.now()}`)
+        // TODO : Only transform if text was rotated
+        let flattenedPaths = ''
+
+        const clonedGroup = this.overlay.textGroup.clone()
+
+        let paths = clonedGroup.children()
+        const transformObject = new Matrix(this.overlay.textGroup)
+        const transformArray = [transformObject.a, transformObject.b, transformObject.c, transformObject.d, transformObject.e, transformObject.f]
+
+        paths.forEach((path) => {
+          if (path.type === 'path') {
+            const pathD = path.attr('d')
+            let newPathD = ''
+
+            if (this.overlay.rotation !== 0) {
+              newPathD = new SvgPath(pathD)
+                .matrix(transformArray)
+                .round(3)
+                .toString()
+            } else {
+              newPathD = new SvgPath(pathD)
+                .round(3)
+                .toString()
+            }
+
+            flattenedPaths += path.plot(newPathD).svg()
+          }
+        })
+        const flattenedGroup = `<g>${flattenedPaths}</g>`
+        downloadSVG(this.$refs.svgWrapper.childNodes[1], flattenedGroup, `line-text-${Date.now()}`)
       },
-      convert() {
+      createTextPaths() {
         this.paths = []
         const fontData = this.fonts[this.font.selected].data
         const inputString = this.text
