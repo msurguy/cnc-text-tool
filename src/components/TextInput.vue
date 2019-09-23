@@ -13,7 +13,7 @@
     </div>
     <div class="control-header">
       <input class="control-text-input" type="text" :value="value" @change="onInput">
-      <a class="btn" @click="$emit('reset')">reset</a>
+      <a v-if="showReset" class="btn" @click="$emit('reset')">reset</a>
     </div>
   </div>
 </template>
@@ -37,6 +37,10 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    showReset: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {

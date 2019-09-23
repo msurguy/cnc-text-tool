@@ -31,6 +31,9 @@
                         <div v-if="source.svg">
                             <text-input label="Input String" @reset="resetTextInput"
                                         :value="text" @input="updateText"></text-input>
+                            <double-text-input label="Position" first-label="x:" second-label="y:"
+                                        :first-value="overlay.x" :second-value="overlay.y" @firstInput="moveOverlayX"
+                                               @secondInput="moveOverlayY"></double-text-input>
                             <select-field label="Font" v-model="font.selected"
                                           :options="fontOptions"></select-field>
                             <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.size"></slider>
@@ -79,6 +82,7 @@
   import Slider from "@/components/Slider";
   // import ButtonGroup from "@/components/ButtonGroup";
   import TextInput from "@/components/TextInput";
+  import DoubleTextInput from "@/components/DoubleTextInput";
   import {SVG, Matrix} from "@svgdotjs/svg.js";
   import '@/lib/svg.draggable'
 
@@ -97,7 +101,8 @@
       SelectField,
       Slider,
      // ButtonGroup,
-      TextInput
+      TextInput,
+      DoubleTextInput
     },
     props: {
       msg: String
@@ -125,7 +130,7 @@
           rotation: 0
         },
         paths: [],
-        text: 'Type Text Here',
+        text: 'Lorem Ipsum',
         fonts: {
           'EMSAllure': {
             data: null,
@@ -220,7 +225,7 @@
         },
         fontOptions: [],
         font: {
-          selected: 'EMSAllure',
+          selected: 'HersheySans1',
           size: 24,
           color: false,
           loading: false
@@ -246,10 +251,10 @@
       paths (paths) {
         this.overlay.textGroup.clear()
         paths.forEach((path) => {
-          this.overlay.textGroup.path(path.d).fill('none').stroke({width: 1, color: this.font.color ? '#FFFFFF' : '#000000', linecap: 'join'})
+          this.overlay.textGroup.path(path.d).fill('none').stroke({width: '1px', color: this.font.color ? '#FFFFFF' : '#000000', linecap: 'join'})
         })
         const {x, y, width, height} = this.overlay.textGroup.bbox()
-        this.overlay.textGroup.rect(width, height).fill('#FFF').opacity(0).move(x, y)
+        this.overlay.textGroup.rect(width, height).fill('rgba(0,0,0,0)').move(x, y)
         this.overlay.textGroup.move(this.overlay.x, this.overlay.y)
       }
     },
@@ -271,6 +276,14 @@
       this.loadFont()
     },
     methods: {
+      moveOverlayX(value) {
+        this.overlay.x = parseFloat(value)
+        this.overlay.textGroup.move(value, this.overlay.y)
+      },
+      moveOverlayY(value) {
+        this.overlay.y = parseFloat(value)
+        this.overlay.textGroup.move(this.overlay.x, value)
+      },
       updateText: debounce(function (e) {
         this.text = e
         this.createTextPaths()
@@ -329,6 +342,9 @@
           if (this.source.viewbox) {
             const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
             this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3])
+            this.overlay.x = parsedViewbox[0]
+            this.overlay.y = parsedViewbox[1]
+            this.overlay.textGroup.move(parsedViewbox[0], parsedViewbox[1])
           }
 
           this.source.svg = svgElement //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
@@ -424,11 +440,7 @@
               this.paths.push({
                 d: new SvgPath(fontData[encodedCharacter].d)
                   .translate(originX, originY)
-                  //.rotate(this.overlay.rotation)
                   //.skew()
-                  //.skewY(10)
-                  // .abs()
-                  // .round(2)
                   .rel()
                   .round(2)
                   .toString()

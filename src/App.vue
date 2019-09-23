@@ -25,4 +25,12 @@ export default {
   left: 0;
   top: 0;
 }
+
+#svg-wrapper rect {
+  pointer-events: all;
+}
+
+#svg-wrapper svg:first-child rect:hover {
+  fill: rgba(0,0,0,0.08)
+}
 </style>
