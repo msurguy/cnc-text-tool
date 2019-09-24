@@ -329,15 +329,34 @@
           this.$refs.svgWrapper.appendChild(svgElement)
 
           // Grab Width, Height and Viewbox attributes:
+          this.source.viewbox = svgElement.getAttribute('viewBox')
           this.source.width = svgElement.getAttribute('width')
           this.source.height = svgElement.getAttribute('height')
-          this.source.viewbox = svgElement.getAttribute('viewBox')
 
-          this.overlay.width = this.source.width
-          this.overlay.height = this.source.height
-          this.overlay.viewbox = this.source.viewbox
+          // IF only viewbox is present, assume units are in pixels and skip scaling factor
 
-          this.overlay.svg.size(this.overlay.width, this.overlay.height)
+          // const widthUnit = originalWidthString.match(/[a-zA-Z]+/g)[0]
+          // const heightUnit = originalHeightString.match(/[a-zA-Z]+/g)[0]
+
+          // this.source.width.unit = widthUnit
+          // this.source.height.unit = heightUnit
+          //
+          // this.source.width.value = parseFloat(originalWidthString.slice(0, -(widthUnit.length)))
+          // this.source.height.value = parseFloat(originalHeightString.slice(0, -(heightUnit.length)))
+          //
+          // const transformedWidth = convertUnits(this.source.width.value, this.source.width.unit, 'px')
+          // const transformedHeight = convertUnits(this.source.height.value, this.source.height.unit, 'px')
+          //
+          // let totalWidth = transformedWidth
+          // let totalHeight = transformedHeight
+          //
+          // if (this.source.width.value < viewBoxDimensions.width) {
+          //   totalWidth = convertUnits(viewBoxDimensions.width, this.source.width.unit, 'px')
+          // }
+          //
+          // if (this.source.height.value < viewBoxDimensions.height) {
+          //   totalHeight = convertUnits(viewBoxDimensions.height, this.source.height.unit, 'px')
+          // }
 
           if (this.source.viewbox) {
             const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
@@ -345,7 +364,22 @@
             this.overlay.x = parsedViewbox[0]
             this.overlay.y = parsedViewbox[1]
             this.overlay.textGroup.move(parsedViewbox[0], parsedViewbox[1])
+            // Some SVGs don't have width and height and instead just have viewbox, let's extract width and height from 3rd and 4th element
+            if (!this.source.width) {
+              this.source.width = parsedViewbox[2]
+              svgElement.setAttribute('width', parsedViewbox[2])
+            }
+            if (!this.source.height) {
+              this.source.height = parsedViewbox[3]
+              svgElement.setAttribute('height', parsedViewbox[3])
+            }
           }
+
+          this.overlay.width = this.source.width
+          this.overlay.height = this.source.height
+          this.overlay.viewbox = this.source.viewbox
+
+          this.overlay.svg.size(this.overlay.width, this.overlay.height)
 
           this.source.svg = svgElement //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
           this.source.loading = false
