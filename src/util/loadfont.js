@@ -29,13 +29,13 @@ export default function parseFont(element, size = 24) {
         .translate(0, -fontAscent)
         .scale(scale, -scale)
         .abs()
-        .round(2)
+        // .round(2)
         .rel()
-        .round(2)
+        //.round(2)
         .toString() : null,
       unicode: unicode,
       name: name,
-      width: parseFloat((width * scale).toFixed(1)),
+      width: parseFloat(width * scale), //.toFixed(1)),
       height: EM
     }
   });

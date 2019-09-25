@@ -36,7 +36,7 @@
                                                @secondInput="moveOverlayY"></double-text-input>
                             <select-field label="Font" v-model="font.selected"
                                           :options="fontOptions"></select-field>
-                            <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.size"></slider>
+                            <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.sizeInPixels"></slider>
                             <slider :min="-360" :max="360" :step="1" label="Rotation" v-model.number="overlay.rotation"></slider>
                             <toggle label="Black / White" v-model="font.color"></toggle>
                         </div>
@@ -91,6 +91,7 @@
 
   import he from 'he'
   import {downloadSVG} from "@/util/utils";
+  import convertUnits from "@/lib/unitConverter";
 
   const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/hershey-text/raw/master/hershey-text/svg_fonts/'
 
@@ -226,9 +227,12 @@
         fontOptions: [],
         font: {
           selected: 'HersheySans1',
+          sizeInPixels: 24,
           size: 24,
           color: false,
-          loading: false
+          loading: false,
+          strokeWidth: 1,
+          widthUnit: 'px'
         }
       }
     },
@@ -239,7 +243,8 @@
       'font.loading'(newValue, oldValue) {
         if (oldValue === true && newValue === false) this.createTextPaths()
       },
-      'font.size'() {
+      'font.sizeInPixels'(value) {
+        this.font.size = convertUnits(value, 'px', this.font.widthUnit)
         this.loadFont()
       },
       'font.color'(){
@@ -251,7 +256,7 @@
       paths (paths) {
         this.overlay.textGroup.clear()
         paths.forEach((path) => {
-          this.overlay.textGroup.path(path.d).fill('none').stroke({width: '1px', color: this.font.color ? '#FFFFFF' : '#000000', linecap: 'join'})
+          this.overlay.textGroup.path(path.d).fill('none').stroke({width: this.font.strokeWidth, color: this.font.color ? '#FFFFFF' : '#000000', linecap: 'join'})
         })
         const {x, y, width, height} = this.overlay.textGroup.bbox()
         this.overlay.textGroup.rect(width, height).fill('rgba(0,0,0,0)').move(x, y)
@@ -322,6 +327,8 @@
           this.source.string = fileContents //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
 
           const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+          // Remove classes used in this application
+          svgElement.classList.remove("canvas");
 
           if (this.$refs.svgWrapper.childNodes[1]) {
             this.$refs.svgWrapper.removeChild(this.$refs.svgWrapper.childNodes[1])
@@ -329,34 +336,9 @@
           this.$refs.svgWrapper.appendChild(svgElement)
 
           // Grab Width, Height and Viewbox attributes:
-          this.source.viewbox = svgElement.getAttribute('viewBox')
-          this.source.width = svgElement.getAttribute('width')
-          this.source.height = svgElement.getAttribute('height')
-
-          // IF only viewbox is present, assume units are in pixels and skip scaling factor
-
-          // const widthUnit = originalWidthString.match(/[a-zA-Z]+/g)[0]
-          // const heightUnit = originalHeightString.match(/[a-zA-Z]+/g)[0]
-
-          // this.source.width.unit = widthUnit
-          // this.source.height.unit = heightUnit
-          //
-          // this.source.width.value = parseFloat(originalWidthString.slice(0, -(widthUnit.length)))
-          // this.source.height.value = parseFloat(originalHeightString.slice(0, -(heightUnit.length)))
-          //
-          // const transformedWidth = convertUnits(this.source.width.value, this.source.width.unit, 'px')
-          // const transformedHeight = convertUnits(this.source.height.value, this.source.height.unit, 'px')
-          //
-          // let totalWidth = transformedWidth
-          // let totalHeight = transformedHeight
-          //
-          // if (this.source.width.value < viewBoxDimensions.width) {
-          //   totalWidth = convertUnits(viewBoxDimensions.width, this.source.width.unit, 'px')
-          // }
-          //
-          // if (this.source.height.value < viewBoxDimensions.height) {
-          //   totalHeight = convertUnits(viewBoxDimensions.height, this.source.height.unit, 'px')
-          // }
+          this.source.viewbox = svgElement.hasAttribute('viewBox') ? svgElement.getAttribute('viewBox') : false
+          this.source.width = svgElement.hasAttribute('width') ? svgElement.getAttribute('width') : 0
+          this.source.height = svgElement.hasAttribute('height') ? svgElement.getAttribute('height') : 0
 
           if (this.source.viewbox) {
             const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
@@ -375,18 +357,35 @@
             }
           }
 
+          // Retrieve width Unit
+          const widthUnitPresent = this.source.width.match(/[a-zA-Z]+/g)
+
+          // By default, the unit will be in pixels
+          this.font.widthUnit = 'px'
+          if (widthUnitPresent) this.font.widthUnit = widthUnitPresent[0]
+
+          this.font.strokeWidth = this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
+          this.font.size = this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'px', this.font.widthUnit) : this.font.sizeInPixels
+
           this.overlay.width = this.source.width
           this.overlay.height = this.source.height
-          this.overlay.viewbox = this.source.viewbox
+          this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`
+
+          if (!this.source.viewbox) {
+            this.overlay.svg.viewbox(0, 0, this.overlay.width, this.overlay.height)
+          }
 
           this.overlay.svg.size(this.overlay.width, this.overlay.height)
 
           this.source.svg = svgElement //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
           this.source.loading = false
+
+          this.loadFont()
         };
         reader.readAsText(file);
       },
       async loadFont() {
+        // console.log('loading font')
         this.font.loading = true
         if (this.fonts[this.font.selected].data && (this.font.size === this.fonts[this.font.selected].size)) {
           this.$nextTick(function () {
@@ -398,6 +397,7 @@
           this.fonts[this.font.selected].string = await this.loadFontFromURL(`${FONT_URL_ROOT}${this.font.selected}.svg`)
         }
         this.fonts[this.font.selected].data = parseFont(new DOMParser().parseFromString(this.fonts[this.font.selected].string, "image/svg+xml"), this.font.size)
+        // console.log(this.font.size)
         this.fonts[this.font.selected].size = this.font.size
         this.$nextTick(function () {
           this.font.loading = false
@@ -433,11 +433,11 @@
             if (this.overlay.rotation !== 0) {
               newPathD = new SvgPath(pathD)
                 .matrix(transformArray)
-                .round(3)
+                // .round(3)
                 .toString()
             } else {
               newPathD = new SvgPath(pathD)
-                .round(3)
+                //.round(3)
                 .toString()
             }
 
@@ -476,7 +476,7 @@
                   .translate(originX, originY)
                   //.skew()
                   .rel()
-                  .round(2)
+                  //.round(2)
                   .toString()
               })
             }
