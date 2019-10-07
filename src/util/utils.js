@@ -8,7 +8,7 @@ export function downloadSVG(element, svgContent, fileName) {
   // svgString = svgString.replace(/([+]?\d+\.\d{3,}([eE][+]?\d+)?)/g, (x) => (+x).toFixed(3))
   // remove Vue's data IDs
   // svgString = svgString.replace(/ data-v-([0-9a-z]){8}=""/g, () => '')
-  svgString = svgString.replace('>', `>\n${svgContent}\n`)
+  svgString = svgString.replace('</svg>', `\n${svgContent}\n</svg>`)
 
   const blob = new Blob([svgDoctype + svgString], {type: 'image/svg+xml;charset=utf-8'})
 
