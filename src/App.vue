@@ -363,7 +363,7 @@
           }
 
           // Retrieve width Unit
-          const widthUnitPresent = this.source.width.match(/[a-zA-Z]+/g)
+          const widthUnitPresent = (typeof this.source.width == 'number') ? false : this.source.width.match(/[a-zA-Z]+/g)
 
           // By default, the unit will be in pixels
           this.font.widthUnit = 'px'
@@ -371,7 +371,6 @@
 
           this.font.strokeWidth = this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
           this.font.size = this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'px', this.font.widthUnit) : this.font.sizeInPixels
-
           this.overlay.width = this.source.width
           this.overlay.height = this.source.height
           this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`
@@ -492,7 +491,7 @@
   }
 </script>
 
-<style scoped>
+<style>
 
   #app {
     height: 100%;

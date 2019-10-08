@@ -17,10 +17,12 @@ export function downloadSVG(element, svgContent, fileName) {
 
   const downloadLink = document.createElement('a')
   downloadLink.href = svgUrl
+  downloadLink.target = '_blank'
   downloadLink.download = `${fileName}.svg`
   document.body.appendChild(downloadLink)
   downloadLink.click()
   document.body.removeChild(downloadLink)
+  URL.revokeObjectURL(svgUrl)
 }
 
 export function stringToInlineSVG(string) {
