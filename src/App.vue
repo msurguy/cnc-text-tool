@@ -92,7 +92,7 @@
 
   import he from 'he'
   import { downloadSVG } from "@/util/utils";
-  import convertUnits from "@/lib/unitConverter";
+  // import convertUnits from "@/lib/unitConverter";
 
   const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/hershey-text/raw/master/hershey-text/svg_fonts/'
 
@@ -245,7 +245,7 @@
         if (oldValue === true && newValue === false) this.createTextPaths()
       },
       'font.sizeInPixels' (value) {
-        this.font.size = convertUnits(value, 'px', this.font.widthUnit)
+        this.font.size = value // convertUnits(value, 'px', this.font.widthUnit)
         this.loadFont()
       },
       'font.color' () {
@@ -346,7 +346,8 @@
           this.source.height = svgElement.hasAttribute('height') ? svgElement.getAttribute('height') : 0
 
           if (this.source.viewbox) {
-            const parsedViewbox = this.source.viewbox.split(' ').map(value => parseFloat(value))
+            const viewBoxDelimeter = this.source.viewbox.indexOf(',') > -1 ? ',' : ' '
+            const parsedViewbox = this.source.viewbox.split(viewBoxDelimeter).map(value => parseFloat(value))
             this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3])
             this.overlay.x = parsedViewbox[0]
             this.overlay.y = parsedViewbox[1]
@@ -369,8 +370,8 @@
           this.font.widthUnit = 'px'
           if (widthUnitPresent) this.font.widthUnit = widthUnitPresent[0]
 
-          this.font.strokeWidth = this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
-          this.font.size = this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'px', this.font.widthUnit) : this.font.sizeInPixels
+          this.font.strokeWidth = 1 // this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
+          this.font.size = this.font.sizeInPixels // this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'cm', this.font.widthUnit) : this.font.sizeInPixels
           this.overlay.width = this.source.width
           this.overlay.height = this.source.height
           this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`
