@@ -65,7 +65,7 @@
         <div class="footer">
           <h3>CNC Text Editor</h3>
           <p>Project by <a target="_blank" href="http://twitter.com/msurguy">@msurguy</a> (<a target="_blank"
-                                                                                              href="http://github.com/msurguy/svg-cropper">Source</a>)
+                                                                                              href="http://github.com/msurguy/cnc-text-tool">Source</a>)
           </p>
         </div>
       </div>
