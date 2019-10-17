@@ -1,4 +1,4 @@
-# svgfontviewer
+# CNC Hershey Font Tool
 
 ## Project setup
 ```
