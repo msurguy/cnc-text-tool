@@ -30,14 +30,15 @@
 
             <transition name="slide">
               <div v-if="source.svg">
-                <text-input label="Input String" @reset="resetTextInput"
-                            :value="text" @input="updateText"></text-input>
+                <text-area-input label="Input Text" @reset="resetTextInput"
+                            :value="text" @input="updateText"></text-area-input>
                 <double-text-input label="Position" first-label="x:" second-label="y:"
                                    :first-value="overlay.x" :second-value="overlay.y" @firstInput="moveOverlayX"
                                    @secondInput="moveOverlayY"></double-text-input>
                 <select-field label="Font" v-model="font.selected"
                               :options="fontOptions"></select-field>
                 <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.sizeInPixels"></slider>
+                <slider :min="0.5" :max="3" :step="0.1" label="Line Height" v-model.number="font.lineHeight"></slider>
                 <slider :min="-360" :max="360" :step="1" label="Rotation" v-model.number="overlay.rotation"></slider>
                 <toggle label="Black / White" v-model="font.color"></toggle>
               </div>
@@ -82,7 +83,7 @@
   import SelectField from "@/components/SelectField";
   import Slider from "@/components/Slider";
   // import ButtonGroup from "@/components/ButtonGroup";
-  import TextInput from "@/components/TextInput";
+  import TextAreaInput from "@/components/TextAreaInput";
   import DoubleTextInput from "@/components/DoubleTextInput";
   import { SVG, Matrix } from "@svgdotjs/svg.js";
   import '@/lib/svg.draggable'
@@ -103,7 +104,7 @@
       SelectField,
       Slider,
       // ButtonGroup,
-      TextInput,
+      TextAreaInput,
       DoubleTextInput
     },
     props: {
@@ -132,7 +133,7 @@
           rotation: 0
         },
         paths: [],
-        text: 'Lorem Ipsum',
+        text: 'Hershey Text\nLorem Ipsum',
         fonts: {
           'EMSAllure': {
             data: null,
@@ -230,6 +231,7 @@
           selected: 'HersheySans1',
           sizeInPixels: 24,
           size: 24,
+          lineHeight: 1,
           color: false,
           loading: false,
           strokeWidth: 1,
@@ -249,6 +251,9 @@
         this.loadFont()
       },
       'font.color' () {
+        this.createTextPaths()
+      },
+      'font.lineHeight' () {
         this.createTextPaths()
       },
       'overlay.rotation' (degrees) {
@@ -465,7 +470,10 @@
         let characters = inputString.split('')
 
         characters.forEach((character) => {
-
+          if (character === '\n') {
+            originX = 0
+            originY += this.fonts[this.font.selected].size * this.font.lineHeight
+          }
           let encodedCharacter = he.encode(character)
           if (character === ' ') encodedCharacter = ' '
           if (character === '&') encodedCharacter = '&'
