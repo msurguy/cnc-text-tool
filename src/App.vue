@@ -37,6 +37,8 @@
                                    @secondInput="moveOverlayY"></double-text-input>
                 <select-field label="Font" v-model="font.selected"
                               :options="fontOptions"></select-field>
+                <select-field label="Alignment" v-model="font.alignment"
+                              :options="fontAlignmentOptions"></select-field>
                 <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.sizeInPixels"></slider>
                 <slider :min="0.5" :max="3" :step="0.1" label="Line Height" v-model.number="font.lineHeight"></slider>
                 <slider :min="-360" :max="360" :step="1" label="Rotation" v-model.number="overlay.rotation"></slider>
@@ -103,7 +105,6 @@
       Toggle,
       SelectField,
       Slider,
-      // ButtonGroup,
       TextAreaInput,
       DoubleTextInput
     },
@@ -227,7 +228,13 @@
           }
         },
         fontOptions: [],
+        fontAlignmentOptions: [
+          { text: 'Left', value: 'left' },
+          { text: 'Center', value: 'center' },
+          { text: 'Right', value: 'right' }
+        ],
         font: {
+          alignment: 'left',
           selected: 'HersheySans1',
           sizeInPixels: 24,
           size: 24,
@@ -254,6 +261,9 @@
         this.createTextPaths()
       },
       'font.lineHeight' () {
+        this.createTextPaths()
+      },
+      'font.alignment' () {
         this.createTextPaths()
       },
       'overlay.rotation' (degrees) {
@@ -465,12 +475,43 @@
         // Generate SVGs in a grid inside of SVG file
 
         let originX = 0
+        let lineWidth = 0
         let originY = 0
+        let lineWidths = []
+        let lineIndex = 0
+        let maxLineWidth = 0
 
         let characters = inputString.split('')
 
+        if (this.font.alignment !== 'left') {
+          // First calculate line widths
+          characters.forEach((character, index) => {
+            if (character === '\n') {
+              lineWidths.push(lineWidth)
+              lineWidth = 0
+            }
+            let encodedCharacter = he.encode(character)
+            if (character === ' ') encodedCharacter = ' '
+            if (character === '&') encodedCharacter = '&'
+            if (character === '\'') encodedCharacter = '&apos;'
+
+            if (encodedCharacter.length > 2) encodedCharacter = encodedCharacter.toLowerCase()
+
+            if (fontData[encodedCharacter]) {
+              lineWidth += fontData[encodedCharacter].width
+              // if last character, add to line widths
+              if (index + 1 === characters.length) {
+                lineWidths.push(lineWidth)
+              }
+            }
+          })
+
+          maxLineWidth = Math.max(...lineWidths)
+        }
+
         characters.forEach((character) => {
           if (character === '\n') {
+            lineIndex = lineIndex + 1
             originX = 0
             originY += this.fonts[this.font.selected].size * this.font.lineHeight
           }
@@ -483,9 +524,12 @@
 
           if (fontData[encodedCharacter]) {
             if (fontData[encodedCharacter].d) {
+              let characterXPosition = originX
+              if (this.font.alignment === 'center') characterXPosition = originX - (lineWidths[lineIndex] / 2)
+              if (this.font.alignment === 'right') characterXPosition = originX - maxLineWidth - (lineWidths[lineIndex])
               this.paths.push({
                 d: new SvgPath(fontData[encodedCharacter].d)
-                        .translate(originX, originY)
+                        .translate(characterXPosition, originY)
                         //.skew()
                         .rel()
                         //.round(2)
