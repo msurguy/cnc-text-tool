@@ -97,7 +97,7 @@
   import { downloadSVG } from "@/util/utils";
   // import convertUnits from "@/lib/unitConverter";
 
-  const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/hershey-text/raw/master/hershey-text/svg_fonts/'
+  const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/svg-fonts/raw/master/fonts/'
 
   export default {
     name: 'HelloWorld',
@@ -136,92 +136,243 @@
         paths: [],
         text: 'Hershey Text\nLorem Ipsum',
         fonts: {
-          'EMSAllure': {
+
+          EMSAllure: {
+            filename: 'EMS/EMSAllure',
             data: null,
             string: '',
             size: 24
           },
-          'EMSElfin': {
+          EMSBird: {
+            filename: 'EMS/EMSBird',
             data: null,
             string: '',
             size: 24
           },
-          'EMSFelix': {
+          EMSBirdSwashCaps: {
+            filename: 'EMS/EMSBirdSwashCaps',
             data: null,
             string: '',
             size: 24
           },
-          'EMSNixish': {
+          EMSBrush: {
+            filename: 'EMS/EMSBrush',
             data: null,
             string: '',
             size: 24
           },
-          'EMSNixishItalic': {
+          EMSCapitol: {
+            filename: 'EMS/EMSCapitol',
             data: null,
             string: '',
             size: 24
           },
-          'EMSOsmotron': {
+          EMSCasualHand: {
+            filename: 'EMS/EMSCasualHand',
             data: null,
             string: '',
             size: 24
           },
-          'EMSReadability': {
+          EMSDecorousScript: {
+            filename: 'EMS/EMSDecorousScript',
             data: null,
             string: '',
             size: 24
           },
-          'EMSReadabilityItalic': {
+          EMSDelight: {
+            filename: 'EMS/EMSDelight',
             data: null,
             string: '',
             size: 24
           },
-          'EMSTech': {
+          EMSDelightSwashCaps: {
+            filename: 'EMS/EMSDelightSwashCaps',
             data: null,
             string: '',
             size: 24
           },
-          'HersheyGothEnglish': {
+          EMSElfin: {
+            filename: 'EMS/EMSElfin',
             data: null,
             string: '',
             size: 24
           },
-          'HersheySans1': {
+          EMSFelix: {
+            filename: 'EMS/EMSFelix',
             data: null,
             string: '',
             size: 24
           },
-          'HersheySansMed': {
+          EMSHerculean: {
+            filename: 'EMS/EMSHerculean',
             data: null,
             string: '',
             size: 24
           },
-          'HersheyScript1': {
+          EMSInvite: {
+            filename: 'EMS/EMSInvite',
             data: null,
             string: '',
             size: 24
           },
-          'HersheyScriptMed': {
+          EMSLeague: {
+            filename: 'EMS/EMSLeague',
             data: null,
             string: '',
             size: 24
           },
-          'HersheySerifBold': {
+          EMSLittlePrincess: {
+            filename: 'EMS/EMSLittlePrincess',
             data: null,
             string: '',
             size: 24
           },
-          'HersheySerifBoldItalic': {
+          EMSMistyNight: {
+            filename: 'EMS/EMSMistyNight',
             data: null,
             string: '',
             size: 24
           },
-          'HersheySerifMed': {
+          EMSNeato: {
+            filename: 'EMS/EMSNeato',
             data: null,
             string: '',
             size: 24
           },
-          'HersheySerifMedItalic': {
+          EMSNixish: {
+            filename: 'EMS/EMSNixish',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSNixishItalic: {
+            filename: 'EMS/EMSNixishItalic',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSOsmotron: {
+            filename: 'EMS/EMSOsmotron',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSPancakes: {
+            filename: 'EMS/EMSPancakes',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSPepita: {
+            filename: 'EMS/EMSPepita',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSQwandry: {
+            filename: 'EMS/EMSQwandry',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSReadability: {
+            filename: 'EMS/EMSReadability',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSReadabilityItalic: {
+            filename: 'EMS/EMSReadabilityItalic',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSSociety: {
+            filename: 'EMS/EMSSociety',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSSpaceRocks: {
+            filename: 'EMS/EMSSpaceRocks',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSSwiss: {
+            filename: 'EMS/EMSSwiss',
+            data: null,
+            string: '',
+            size: 24
+          },
+          EMSTech: {
+            filename: 'EMS/EMSTech',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheyGothEnglish: {
+            filename: 'Hershey/HersheyGothEnglish',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheyGothGerman: {
+            filename: 'Hershey/HersheyGothGerman',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheyGothItalian: {
+            filename: 'Hershey/HersheyGothItalian',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheySans1: {
+            filename: 'Hershey/HersheySans1',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheySansMed: {
+            filename: 'Hershey/HersheySansMed',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheyScript1: {
+            filename: 'Hershey/HersheyScript1',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheyScriptMed: {
+            filename: 'Hershey/HersheyScriptMed',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheySerifBold: {
+            filename: 'Hershey/HersheySerifBold',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheySerifBoldItalic: {
+            filename: 'Hershey/HersheySerifBoldItalic',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheySerifMed: {
+            filename: 'Hershey/HersheySerifMed',
+            data: null,
+            string: '',
+            size: 24
+          },
+          HersheySerifMedItalic: {
+            filename: 'Hershey/HersheySerifMedItalic',
             data: null,
             string: '',
             size: 24
@@ -235,7 +386,7 @@
         ],
         font: {
           alignment: 'left',
-          selected: 'HersheySans1',
+          selected: 'HersheyScriptMed',
           sizeInPixels: 24,
           size: 24,
           lineHeight: 1,
@@ -406,19 +557,21 @@
       },
       async loadFont () {
         // console.log('loading font')
+        const fontMeta = this.fonts[this.font.selected]
         this.font.loading = true
-        if (this.fonts[this.font.selected].data && (this.font.size === this.fonts[this.font.selected].size)) {
+        if (fontMeta.data && (this.font.size === fontMeta.size)) {
           this.$nextTick(function () {
             this.font.loading = false
           })
           return
         }
-        if (!this.fonts[this.font.selected].data) {
-          this.fonts[this.font.selected].string = await this.loadFontFromURL(`${FONT_URL_ROOT}${this.font.selected}.svg`)
+        if (!fontMeta.data) {
+          // Path is retrieved from the font path
+          fontMeta.string = await this.loadFontFromURL(`${FONT_URL_ROOT}${fontMeta.filename}.svg`)
         }
-        this.fonts[this.font.selected].data = parseFont(new DOMParser().parseFromString(this.fonts[this.font.selected].string, "image/svg+xml"), this.font.size)
+        fontMeta.data = parseFont(new DOMParser().parseFromString(fontMeta.string, "image/svg+xml"), this.font.size)
         // console.log(this.font.size)
-        this.fonts[this.font.selected].size = this.font.size
+        fontMeta.size = this.font.size
         this.$nextTick(function () {
           this.font.loading = false
         })
