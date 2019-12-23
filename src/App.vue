@@ -113,7 +113,7 @@
     data () {
       return {
         source: {
-          name: '',
+          filename: '',
           svg: '',
           string: '',
           loading: false,
@@ -133,7 +133,10 @@
           rotation: 0
         },
         paths: [],
-        text: 'Hershey Text\nLorem Ipsum',
+        text: 'Upload your own SVGs to create\n' +
+          'text overlay in existing files,\n' +
+          'Or use this default SVG as your canvas. \n' +
+          'Change font size, font style and more',
         fonts: {
 
           EMSAllure: {
@@ -385,7 +388,7 @@
         ],
         font: {
           alignment: 'left',
-          selected: 'HersheyScriptMed',
+          selected: 'EMSReadabilityItalic',
           sizeInPixels: 24,
           size: 24,
           lineHeight: 1,
@@ -448,7 +451,10 @@
       this.fontOptions = Object.keys(this.fonts).map((fontName) => {
         return { text: fontName, value: fontName }
       });
-      this.loadFont()
+
+      this.$nextTick(() => {
+        this.processInputSVG('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 792"><title>CNC Fill Text</title></svg>')
+      })
     },
     methods: {
       moveOverlayX (value) {
@@ -465,13 +471,10 @@
       }, 300),
       resetTextInput () {
         this.text = '';
-
       },
       onSourceFileChange (e) {
         this.source.loading = true;
-
         // reset position / scale / other params of the text
-
         let files = e.target.files || e.dataTransfer.files;
         if (!files.length)
           return;
@@ -481,7 +484,7 @@
         const reader = new FileReader();
         reader.onload = async (e) => {
           // Set file name
-          this.source.name = file.name.substr(0, file.name.lastIndexOf('.'));
+          this.source.filename = file.name.substr(0, file.name.lastIndexOf('.'));
 
           // try finding "<svg" in the document:
           let fileContents = e.target.result;
@@ -494,72 +497,79 @@
 
           // Remove everything that occurs prior to SVG opening tag
           fileContents = fileContents.substring(firstOccurenceOfSVG);
-          this.source.string = fileContents; //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
-
-          const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement;
-          // Remove classes used in this application
-          svgElement.classList.remove("canvas");
-
-          if (this.$refs.svgWrapper.childNodes[1]) {
-            this.$refs.svgWrapper.removeChild(this.$refs.svgWrapper.childNodes[1])
-          }
-          this.$refs.svgWrapper.appendChild(svgElement);
-
-          // Grab Width, Height and Viewbox attributes:
-          this.source.viewbox = svgElement.hasAttribute('viewBox') ? svgElement.getAttribute('viewBox') : false;
-          this.source.width = svgElement.hasAttribute('width') ? svgElement.getAttribute('width') : 0;
-          this.source.height = svgElement.hasAttribute('height') ? svgElement.getAttribute('height') : 0;
-
-          if (this.source.viewbox) {
-            const viewBoxDelimeter = this.source.viewbox.indexOf(',') > -1 ? ',' : ' ';
-            const parsedViewbox = this.source.viewbox.split(viewBoxDelimeter).map(value => parseFloat(value));
-            this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3]);
-            this.overlay.x = parsedViewbox[0];
-            this.overlay.y = parsedViewbox[1];
-            this.overlay.textGroup.move(parsedViewbox[0], parsedViewbox[1]);
-            // Some SVGs don't have width and height and instead just have viewbox, let's extract width and height from 3rd and 4th element
-            if (!this.source.width) {
-              this.source.width = parsedViewbox[2];
-              svgElement.setAttribute('width', parsedViewbox[2])
-            }
-            if (!this.source.height) {
-              this.source.height = parsedViewbox[3];
-              svgElement.setAttribute('height', parsedViewbox[3])
-            }
-          }
-
-          // Retrieve width Unit
-          const widthUnitPresent = (typeof this.source.width == 'number') ? false : this.source.width.match(/[a-zA-Z]+/g);
-
-          // By default, the unit will be in pixels
-          this.font.widthUnit = 'px';
-          if (widthUnitPresent) this.font.widthUnit = widthUnitPresent[0];
-
-          this.font.strokeWidth = 1; // this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
-          this.font.size = this.font.sizeInPixels; // this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'cm', this.font.widthUnit) : this.font.sizeInPixels
-          this.overlay.width = this.source.width;
-          this.overlay.height = this.source.height;
-          this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`;
-
-          if (!this.source.viewbox) {
-            this.overlay.svg.viewbox(0, 0, this.overlay.width, this.overlay.height)
-          }
-
-          this.overlay.svg.size(this.overlay.width, this.overlay.height);
-
-          this.source.svg = svgElement; //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
-          this.source.loading = false;
-
-          this.loadFont()
+          this.processInputSVG(fileContents)
         };
         reader.readAsText(file);
+      },
+      async processInputSVG (fileContents) {
+        this.source.string = fileContents; //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+
+        const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement;
+        // eslint-disable-next-line no-console
+        console.log(svgElement)
+        // Remove classes used in this application
+        svgElement.classList.remove("canvas");
+
+        if (this.$refs.svgWrapper.childNodes[1]) {
+          this.$refs.svgWrapper.removeChild(this.$refs.svgWrapper.childNodes[1])
+        }
+        this.$refs.svgWrapper.appendChild(svgElement);
+
+        // Grab Width, Height and Viewbox attributes:
+        this.source.viewbox = svgElement.hasAttribute('viewBox') ? svgElement.getAttribute('viewBox') : false;
+        this.source.width = svgElement.hasAttribute('width') ? svgElement.getAttribute('width') : 0;
+        this.source.height = svgElement.hasAttribute('height') ? svgElement.getAttribute('height') : 0;
+
+        if (this.source.viewbox) {
+          // eslint-disable-next-line no-console
+          console.log(this.source.viewbox)
+          const viewBoxDelimeter = this.source.viewbox.indexOf(',') > -1 ? ',' : ' ';
+          const parsedViewbox = this.source.viewbox.split(viewBoxDelimeter).map(value => parseFloat(value));
+          this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3]);
+          this.overlay.x = parsedViewbox[0];
+          this.overlay.y = parsedViewbox[1];
+          this.overlay.textGroup.move(parsedViewbox[0], parsedViewbox[1]);
+          // Some SVGs don't have width and height and instead just have viewbox, let's extract width and height from 3rd and 4th element
+          if (!this.source.width) {
+            this.source.width = parsedViewbox[2];
+            svgElement.setAttribute('width', parsedViewbox[2])
+          }
+          if (!this.source.height) {
+            this.source.height = parsedViewbox[3];
+            svgElement.setAttribute('height', parsedViewbox[3])
+          }
+        }
+
+        // Retrieve width Unit
+        const widthUnitPresent = (typeof this.source.width == 'number') ? false : this.source.width.match(/[a-zA-Z]+/g);
+
+        // By default, the unit will be in pixels
+        this.font.widthUnit = 'px';
+        if (widthUnitPresent) this.font.widthUnit = widthUnitPresent[0];
+
+        this.font.strokeWidth = 1; // this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
+        this.font.size = this.font.sizeInPixels; // this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'cm', this.font.widthUnit) : this.font.sizeInPixels
+        this.overlay.width = this.source.width;
+        this.overlay.height = this.source.height;
+        this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`;
+
+        if (!this.source.viewbox) {
+          this.overlay.svg.viewbox(0, 0, this.overlay.width, this.overlay.height)
+        }
+
+        this.overlay.svg.size(this.overlay.width, this.overlay.height);
+
+        this.source.svg = svgElement; //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+        this.source.loading = false;
+
+        this.loadFont()
       },
       async loadFont () {
         // console.log('loading font')
         const fontMeta = this.fonts[this.font.selected];
         this.font.loading = true;
         if (fontMeta.data && (this.font.size === fontMeta.size)) {
-          this.$nextTick(function () {
+          this.$nextTick(() => {
             this.font.loading = false
           });
           return
@@ -571,7 +581,7 @@
         fontMeta.data = parseFont(new DOMParser().parseFromString(fontMeta.string, "image/svg+xml"), this.font.size);
         // console.log(this.font.size)
         fontMeta.size = this.font.size;
-        this.$nextTick(function () {
+        this.$nextTick(() => {
           this.font.loading = false
         })
       },
@@ -584,15 +594,13 @@
         }
 
         // Remove everything that occurs prior to SVG opening tag
-        data = data.substring(firstOccurenceOfSVG);
-        return data
+        return data.substring(firstOccurenceOfSVG);
       },
       download () {
         // TODO : Only transform if text was rotated
         let flattenedPaths = '';
 
         const clonedGroup = this.overlay.textGroup.clone();
-
         let paths = clonedGroup.children();
         const transformObject = new Matrix(this.overlay.textGroup);
         const transformArray = [transformObject.a, transformObject.b, transformObject.c, transformObject.d, transformObject.e, transformObject.f];
@@ -600,7 +608,7 @@
         paths.forEach((path) => {
           if (path.type === 'path') {
             const pathD = path.attr('d');
-            let newPathD = '';
+            let newPathD
 
             if (this.overlay.rotation !== 0) {
               newPathD = new SvgPath(pathD)
