@@ -79,25 +79,24 @@
 <script>
   import bsCustomFileInput from 'bs-custom-file-input'
 
-  import debounce from 'lodash.debounce'
-
   import Toggle from "@/components/Toggle";
   import SelectField from "@/components/SelectField";
   import Slider from "@/components/Slider";
   // import ButtonGroup from "@/components/ButtonGroup";
   import TextAreaInput from "@/components/TextAreaInput";
   import DoubleTextInput from "@/components/DoubleTextInput";
+
   import { SVG, Matrix } from "@svgdotjs/svg.js";
   import '@/lib/svg.draggable'
 
-  import parseFont from "@/util/loadfont";
   import SvgPath from 'svgpath';
 
-  import he from 'he'
-  import { downloadSVG } from "@/util/utils";
-  // import convertUnits from "@/lib/unitConverter";
+  import { downloadSVG } from "@/util/download";
+  import parseFont from "@/util/fontLoader";
 
-  const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/svg-fonts/raw/master/fonts/'
+  import debounce from 'lodash.debounce'
+
+  const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/svg-fonts/raw/master/fonts/';
 
   export default {
     name: 'HelloWorld',
@@ -405,7 +404,7 @@
         if (oldValue === true && newValue === false) this.createTextPaths()
       },
       'font.sizeInPixels' (value) {
-        this.font.size = value // convertUnits(value, 'px', this.font.widthUnit)
+        this.font.size = value; // convertUnits(value, 'px', this.font.widthUnit)
         this.loadFont()
       },
       'font.color' () {
@@ -421,55 +420,55 @@
         this.overlay.textGroup.transform({ rotate: degrees }, false)
       },
       paths (paths) {
-        this.overlay.textGroup.clear()
+        this.overlay.textGroup.clear();
         paths.forEach((path) => {
           this.overlay.textGroup.path(path.d).fill('none').stroke({
             width: this.font.strokeWidth,
             color: this.font.color ? '#FFFFFF' : '#000000',
             linecap: 'join'
           })
-        })
-        const { x, y, width, height } = this.overlay.textGroup.bbox()
-        this.overlay.textGroup.rect(width, height).fill('rgba(0,0,0,0)').move(x, y)
+        });
+        const { x, y, width, height } = this.overlay.textGroup.bbox();
+        this.overlay.textGroup.rect(width, height).fill('rgba(0,0,0,0)').move(x, y);
         this.overlay.textGroup.move(this.overlay.x, this.overlay.y)
       }
     },
     mounted () {
-      bsCustomFileInput.init()
+      bsCustomFileInput.init();
 
       // Reset the SVG container
-      this.overlay.svg = SVG().addTo('#svg-wrapper').addClass('canvas')
-      this.overlay.svg.size(0, 0)
-      this.overlay.textGroup = this.overlay.svg.group()
+      this.overlay.svg = SVG().addTo('#svg-wrapper').addClass('canvas');
+      this.overlay.svg.size(0, 0);
+      this.overlay.textGroup = this.overlay.svg.group();
       this.overlay.textGroup.draggable().on('dragmove', (e) => {
-        this.overlay.x = e.detail.box.x
+        this.overlay.x = e.detail.box.x;
         this.overlay.y = e.detail.box.y
-      })
+      });
 
       this.fontOptions = Object.keys(this.fonts).map((fontName) => {
         return { text: fontName, value: fontName }
-      })
+      });
       this.loadFont()
     },
     methods: {
       moveOverlayX (value) {
-        this.overlay.x = parseFloat(value)
+        this.overlay.x = parseFloat(value);
         this.overlay.textGroup.move(value, this.overlay.y)
       },
       moveOverlayY (value) {
-        this.overlay.y = parseFloat(value)
+        this.overlay.y = parseFloat(value);
         this.overlay.textGroup.move(this.overlay.x, value)
       },
       updateText: debounce(function (e) {
-        this.text = e
+        this.text = e;
         this.createTextPaths()
       }, 300),
       resetTextInput () {
-        this.text = ''
-        return
+        this.text = '';
+
       },
       onSourceFileChange (e) {
-        this.source.loading = true
+        this.source.loading = true;
 
         // reset position / scale / other params of the text
 
@@ -482,74 +481,74 @@
         const reader = new FileReader();
         reader.onload = async (e) => {
           // Set file name
-          this.source.name = file.name.substr(0, file.name.lastIndexOf('.'))
+          this.source.name = file.name.substr(0, file.name.lastIndexOf('.'));
 
           // try finding "<svg" in the document:
-          let fileContents = e.target.result
+          let fileContents = e.target.result;
 
-          let firstOccurenceOfSVG = fileContents.indexOf('<svg ')
+          let firstOccurenceOfSVG = fileContents.indexOf('<svg ');
 
           if (firstOccurenceOfSVG === -1) {
             firstOccurenceOfSVG = fileContents.indexOf('<SVG ')
           }
 
           // Remove everything that occurs prior to SVG opening tag
-          fileContents = fileContents.substring(firstOccurenceOfSVG)
-          this.source.string = fileContents //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+          fileContents = fileContents.substring(firstOccurenceOfSVG);
+          this.source.string = fileContents; //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
 
-          const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+          const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement;
           // Remove classes used in this application
           svgElement.classList.remove("canvas");
 
           if (this.$refs.svgWrapper.childNodes[1]) {
             this.$refs.svgWrapper.removeChild(this.$refs.svgWrapper.childNodes[1])
           }
-          this.$refs.svgWrapper.appendChild(svgElement)
+          this.$refs.svgWrapper.appendChild(svgElement);
 
           // Grab Width, Height and Viewbox attributes:
-          this.source.viewbox = svgElement.hasAttribute('viewBox') ? svgElement.getAttribute('viewBox') : false
-          this.source.width = svgElement.hasAttribute('width') ? svgElement.getAttribute('width') : 0
-          this.source.height = svgElement.hasAttribute('height') ? svgElement.getAttribute('height') : 0
+          this.source.viewbox = svgElement.hasAttribute('viewBox') ? svgElement.getAttribute('viewBox') : false;
+          this.source.width = svgElement.hasAttribute('width') ? svgElement.getAttribute('width') : 0;
+          this.source.height = svgElement.hasAttribute('height') ? svgElement.getAttribute('height') : 0;
 
           if (this.source.viewbox) {
-            const viewBoxDelimeter = this.source.viewbox.indexOf(',') > -1 ? ',' : ' '
-            const parsedViewbox = this.source.viewbox.split(viewBoxDelimeter).map(value => parseFloat(value))
-            this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3])
-            this.overlay.x = parsedViewbox[0]
-            this.overlay.y = parsedViewbox[1]
-            this.overlay.textGroup.move(parsedViewbox[0], parsedViewbox[1])
+            const viewBoxDelimeter = this.source.viewbox.indexOf(',') > -1 ? ',' : ' ';
+            const parsedViewbox = this.source.viewbox.split(viewBoxDelimeter).map(value => parseFloat(value));
+            this.overlay.svg.viewbox(parsedViewbox[0], parsedViewbox[1], parsedViewbox[2], parsedViewbox[3]);
+            this.overlay.x = parsedViewbox[0];
+            this.overlay.y = parsedViewbox[1];
+            this.overlay.textGroup.move(parsedViewbox[0], parsedViewbox[1]);
             // Some SVGs don't have width and height and instead just have viewbox, let's extract width and height from 3rd and 4th element
             if (!this.source.width) {
-              this.source.width = parsedViewbox[2]
+              this.source.width = parsedViewbox[2];
               svgElement.setAttribute('width', parsedViewbox[2])
             }
             if (!this.source.height) {
-              this.source.height = parsedViewbox[3]
+              this.source.height = parsedViewbox[3];
               svgElement.setAttribute('height', parsedViewbox[3])
             }
           }
 
           // Retrieve width Unit
-          const widthUnitPresent = (typeof this.source.width == 'number') ? false : this.source.width.match(/[a-zA-Z]+/g)
+          const widthUnitPresent = (typeof this.source.width == 'number') ? false : this.source.width.match(/[a-zA-Z]+/g);
 
           // By default, the unit will be in pixels
-          this.font.widthUnit = 'px'
-          if (widthUnitPresent) this.font.widthUnit = widthUnitPresent[0]
+          this.font.widthUnit = 'px';
+          if (widthUnitPresent) this.font.widthUnit = widthUnitPresent[0];
 
-          this.font.strokeWidth = 1 // this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
-          this.font.size = this.font.sizeInPixels // this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'cm', this.font.widthUnit) : this.font.sizeInPixels
-          this.overlay.width = this.source.width
-          this.overlay.height = this.source.height
-          this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`
+          this.font.strokeWidth = 1; // this.font.widthUnit === 'px' ? 1 : convertUnits(1, 'px', this.font.widthUnit)
+          this.font.size = this.font.sizeInPixels; // this.font.widthUnit !== 'px' ? convertUnits(this.font.sizeInPixels, 'cm', this.font.widthUnit) : this.font.sizeInPixels
+          this.overlay.width = this.source.width;
+          this.overlay.height = this.source.height;
+          this.overlay.viewbox = this.source.viewbox ? this.source.viewbox : `0 0 ${this.overlay.width} ${this.overlay.height}`;
 
           if (!this.source.viewbox) {
             this.overlay.svg.viewbox(0, 0, this.overlay.width, this.overlay.height)
           }
 
-          this.overlay.svg.size(this.overlay.width, this.overlay.height)
+          this.overlay.svg.size(this.overlay.width, this.overlay.height);
 
-          this.source.svg = svgElement //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
-          this.source.loading = false
+          this.source.svg = svgElement; //= new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement
+          this.source.loading = false;
 
           this.loadFont()
         };
@@ -557,51 +556,51 @@
       },
       async loadFont () {
         // console.log('loading font')
-        const fontMeta = this.fonts[this.font.selected]
-        this.font.loading = true
+        const fontMeta = this.fonts[this.font.selected];
+        this.font.loading = true;
         if (fontMeta.data && (this.font.size === fontMeta.size)) {
           this.$nextTick(function () {
             this.font.loading = false
-          })
+          });
           return
         }
         if (!fontMeta.data) {
           // Path is retrieved from the font path
           fontMeta.string = await this.loadFontFromURL(`${FONT_URL_ROOT}${fontMeta.filename}.svg`)
         }
-        fontMeta.data = parseFont(new DOMParser().parseFromString(fontMeta.string, "image/svg+xml"), this.font.size)
+        fontMeta.data = parseFont(new DOMParser().parseFromString(fontMeta.string, "image/svg+xml"), this.font.size);
         // console.log(this.font.size)
-        fontMeta.size = this.font.size
+        fontMeta.size = this.font.size;
         this.$nextTick(function () {
           this.font.loading = false
         })
       },
       async loadFontFromURL (url) {
-        let { data } = await this.axios.get(url)
+        let { data } = await this.axios.get(url);
         // Remove anything before first <svg
-        let firstOccurenceOfSVG = data.indexOf('<svg ')
+        let firstOccurenceOfSVG = data.indexOf('<svg ');
         if (firstOccurenceOfSVG === -1) {
           firstOccurenceOfSVG = data.indexOf('<SVG ')
         }
 
         // Remove everything that occurs prior to SVG opening tag
-        data = data.substring(firstOccurenceOfSVG)
+        data = data.substring(firstOccurenceOfSVG);
         return data
       },
       download () {
         // TODO : Only transform if text was rotated
-        let flattenedPaths = ''
+        let flattenedPaths = '';
 
-        const clonedGroup = this.overlay.textGroup.clone()
+        const clonedGroup = this.overlay.textGroup.clone();
 
-        let paths = clonedGroup.children()
-        const transformObject = new Matrix(this.overlay.textGroup)
-        const transformArray = [transformObject.a, transformObject.b, transformObject.c, transformObject.d, transformObject.e, transformObject.f]
+        let paths = clonedGroup.children();
+        const transformObject = new Matrix(this.overlay.textGroup);
+        const transformArray = [transformObject.a, transformObject.b, transformObject.c, transformObject.d, transformObject.e, transformObject.f];
 
         paths.forEach((path) => {
           if (path.type === 'path') {
-            const pathD = path.attr('d')
-            let newPathD = ''
+            const pathD = path.attr('d');
+            let newPathD = '';
 
             if (this.overlay.rotation !== 0) {
               newPathD = new SvgPath(pathD)
@@ -616,72 +615,60 @@
 
             flattenedPaths += path.plot(newPathD).svg()
           }
-        })
-        const flattenedGroup = `<g>${flattenedPaths}</g>`
+        });
+        const flattenedGroup = `<g>${flattenedPaths}</g>`;
         downloadSVG(this.$refs.svgWrapper.childNodes[1], flattenedGroup, `line-text-${Date.now()}`)
       },
       createTextPaths () {
-        this.paths = []
-        const fontData = this.fonts[this.font.selected].data
-        const inputString = this.text
+        this.paths = [];
+        const fontData = this.fonts[this.font.selected].data;
+        const inputString = this.text;
 
         // Generate SVGs in a grid inside of SVG file
 
-        let originX = 0
-        let lineWidth = 0
-        let originY = 0
-        let lineWidths = []
-        let lineIndex = 0
-        let maxLineWidth = 0
+        let originX = 0;
+        let lineWidth = 0;
+        let originY = 0;
+        let lineWidths = [];
+        let lineIndex = 0;
+        let maxLineWidth = 0;
 
-        let characters = inputString.split('')
+        let characters = inputString.split('');
 
         if (this.font.alignment !== 'left') {
           // First calculate line widths
           characters.forEach((character, index) => {
             if (character === '\n') {
-              lineWidths.push(lineWidth)
+              lineWidths.push(lineWidth);
               lineWidth = 0
             }
-            let encodedCharacter = he.encode(character)
-            if (character === ' ') encodedCharacter = ' '
-            if (character === '&') encodedCharacter = '&'
-            if (character === '\'') encodedCharacter = '&apos;'
 
-            if (encodedCharacter.length > 2) encodedCharacter = encodedCharacter.toLowerCase()
-
-            if (fontData[encodedCharacter]) {
-              lineWidth += fontData[encodedCharacter].width
+            if (fontData[character]) {
+              lineWidth += fontData[character].width;
               // if last character, add to line widths
               if (index + 1 === characters.length) {
                 lineWidths.push(lineWidth)
               }
             }
-          })
+          });
 
           maxLineWidth = Math.max(...lineWidths)
         }
 
         characters.forEach((character) => {
           if (character === '\n') {
-            lineIndex = lineIndex + 1
-            originX = 0
+            lineIndex = lineIndex + 1;
+            originX = 0;
             originY += this.fonts[this.font.selected].size * this.font.lineHeight
           }
-          let encodedCharacter = he.encode(character)
-          if (character === ' ') encodedCharacter = ' '
-          if (character === '&') encodedCharacter = '&'
-          if (character === '\'') encodedCharacter = '&apos;'
 
-          if (encodedCharacter.length > 2) encodedCharacter = encodedCharacter.toLowerCase()
-
-          if (fontData[encodedCharacter]) {
-            if (fontData[encodedCharacter].d) {
-              let characterXPosition = originX
-              if (this.font.alignment === 'center') characterXPosition = originX - (lineWidths[lineIndex] / 2)
-              if (this.font.alignment === 'right') characterXPosition = originX - maxLineWidth - (lineWidths[lineIndex])
+          if (fontData[character]) {
+            if (fontData[character].d) {
+              let characterXPosition = originX;
+              if (this.font.alignment === 'center') characterXPosition = originX - (lineWidths[lineIndex] / 2);
+              if (this.font.alignment === 'right') characterXPosition = originX - maxLineWidth - (lineWidths[lineIndex]);
               this.paths.push({
-                d: new SvgPath(fontData[encodedCharacter].d)
+                d: new SvgPath(fontData[character].d)
                         .translate(characterXPosition, originY)
                         //.skew()
                         .rel()
@@ -689,7 +676,7 @@
                         .toString()
               })
             }
-            originX += fontData[encodedCharacter].width
+            originX += fontData[character].width
           }
         })
       }

@@ -24,7 +24,7 @@ export function downloadSVG(element, svgContent, fileName) {
   document.body.removeChild(downloadLink)
   URL.revokeObjectURL(svgUrl)
 }
-
-export function stringToInlineSVG(string) {
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(string)
-}
+//
+// export function stringToInlineSVG(string) {
+//   return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(string)
+// }

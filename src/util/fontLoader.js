@@ -1,4 +1,3 @@
-import each from 'lodash/each'
 import SvgPath from 'svgpath';
 // let XMLDOMParser = require('xmldom').DOMParser; use jsdom instead if used on server
 
@@ -8,7 +7,7 @@ export default function parseFont(element, size = 24) {
 
   const svgFont = element.getElementsByTagName('font')[0];
   const svgFontface = element.getElementsByTagName('font-face')[0];
-  const svgGlyps = element.getElementsByTagName('glyph');
+  const svgGlyphs = element.getElementsByTagName('glyph');
 
   const fontHorizAdvX = svgFont.getAttribute('horiz-adv-x');
   const fontAscent = svgFontface.getAttribute('ascent');
@@ -17,14 +16,15 @@ export default function parseFont(element, size = 24) {
   const EM = size // Unit for the height
   const scale = EM / fontUnitsPerEm;
 
-  each(svgGlyps, function (svgGlyph) {
+  for (var i = 0; i < svgGlyphs.length; i++) {
+    const svgGlyph = svgGlyphs[i]
     const d = svgGlyph.getAttribute('d');
 
     const unicode = svgGlyph.getAttribute('unicode');
     const name = svgGlyph.getAttribute('glyph-name') || ('glyph' + unicode);
     const width = svgGlyph.getAttribute('horiz-adv-x') || fontHorizAdvX;
 
-    result[unicode] = {
+    result[`${unicode}`] = {
       d: d ? new SvgPath(d)
         .translate(0, -fontAscent)
         .scale(scale, -scale)
@@ -38,7 +38,6 @@ export default function parseFont(element, size = 24) {
       width: parseFloat(width * scale), //.toFixed(1)),
       height: EM
     }
-  });
-
+  }
   return result;
 }
