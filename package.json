@@ -18,6 +18,7 @@
     "lodash.debounce": "^4.0.8",
     "svgpath": "^2.2.2",
     "vue": "^2.6.10",
+    "vue-analytics": "^5.22.1",
     "vue-axios": "^2.1.4",
     "vue-svgicon": "^3.2.6"
   },

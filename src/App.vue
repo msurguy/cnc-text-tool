@@ -455,6 +455,8 @@
       this.$nextTick(() => {
         this.processInputSVG('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 792"><title>CNC Fill Text</title></svg>')
       })
+
+      this.$ga.page('/')
     },
     methods: {
       moveOverlayX (value) {
