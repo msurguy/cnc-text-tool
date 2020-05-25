@@ -40,6 +40,7 @@
                 <select-field label="Alignment" v-model="font.alignment"
                               :options="fontAlignmentOptions"></select-field>
                 <slider :min="10" :max="150" :step="1" label="Font Size" v-model.number="font.sizeInPixels"></slider>
+                <slider :min="0" :max="10" :step="0.1" label="Character Spacing" v-model.number="font.characterSpacing"></slider>
                 <slider :min="0.5" :max="3" :step="0.1" label="Line Height" v-model.number="font.lineHeight"></slider>
                 <slider :min="-360" :max="360" :step="1" label="Rotation" v-model.number="overlay.rotation"></slider>
                 <toggle label="Black / White" v-model="font.color"></toggle>
@@ -395,7 +396,8 @@
           color: false,
           loading: false,
           strokeWidth: 1,
-          widthUnit: 'px'
+          widthUnit: 'px',
+          characterSpacing: 0
         }
       }
     },
@@ -414,6 +416,9 @@
         this.createTextPaths()
       },
       'font.lineHeight' () {
+        this.createTextPaths()
+      },
+      'font.characterSpacing' () {
         this.createTextPaths()
       },
       'font.alignment' () {
@@ -654,7 +659,7 @@
             }
 
             if (fontData[character]) {
-              lineWidth += fontData[character].width;
+              lineWidth += fontData[character].width + this.font.characterSpacing;
               // if last character, add to line widths
               if (index + 1 === characters.length) {
                 lineWidths.push(lineWidth)
@@ -686,7 +691,7 @@
                         .toString()
               })
             }
-            originX += fontData[character].width
+            originX += fontData[character].width + this.font.characterSpacing
           }
         })
       }
