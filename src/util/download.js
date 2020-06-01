@@ -13,16 +13,29 @@ export function downloadSVG(element, svgContent, fileName) {
   const blob = new Blob([svgDoctype + svgString], {type: 'image/svg+xml;charset=utf-8'})
 
   /* This portion of script saves the file to local filesystem as a download */
-  let svgUrl = URL.createObjectURL(blob)
+  let svgUrl = (window.URL && window.URL.createObjectURL) ? window.URL.createObjectURL(blob) : window.webkitURL.createObjectURL(blob);
 
   const downloadLink = document.createElement('a')
   downloadLink.href = svgUrl
   downloadLink.target = '_blank'
   downloadLink.download = `${fileName}.svg`
+
+  // Safari thinks _blank anchor are pop ups. We only want to set _blank
+  // target if the browser does not support the HTML5 download attribute.
+  // This allows you to download files in desktop safari if pop up blocking
+  // is enabled.
+  if (typeof downloadLink.download === 'undefined') {
+    downloadLink.setAttribute('target', '_blank')
+  }
+
   document.body.appendChild(downloadLink)
   downloadLink.click()
-  document.body.removeChild(downloadLink)
-  URL.revokeObjectURL(svgUrl)
+
+  // Fixes "webkit blob resource error 1"
+  setTimeout(function () {
+    document.body.removeChild(downloadLink)
+    window.URL.revokeObjectURL(svgUrl)
+  }, 200)
 }
 //
 // export function stringToInlineSVG(string) {
