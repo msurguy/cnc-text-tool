@@ -697,7 +697,7 @@
         }
         if (!fontMeta.data) {
           // Path is retrieved from the font path
-          fontMeta.string = await this.loadFontFromURL(`/fonts/${fontMeta.filename}.svg`)
+          fontMeta.string = await this.loadFontFromURL(`${process.env.BASE_URL}fonts/${fontMeta.filename}.svg`)
         }
         fontMeta.data = parseFont(new DOMParser().parseFromString(fontMeta.string, "image/svg+xml"), this.font.size);
         // console.log(this.font.size)
