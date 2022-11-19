@@ -10,28 +10,28 @@
   },
   "dependencies": {
     "@svgdotjs/svg.draggable.js": "^3.0.2",
-    "@svgdotjs/svg.js": "^3.0.13",
-    "axios": "^0.19.0",
-    "bs-custom-file-input": "^1.3.2",
-    "core-js": "^2.6.5",
+    "@svgdotjs/svg.js": "^3.1.2",
+    "axios": "^0.19.2",
+    "bs-custom-file-input": "^1.3.4",
+    "core-js": "^2.6.12",
     "he": "^1.2.0",
     "lodash.debounce": "^4.0.8",
-    "svgpath": "^2.2.2",
-    "vue": "^2.6.10",
+    "svgpath": "^2.6.0",
+    "vue": "^2.7.14",
     "vue-analytics": "^5.22.1",
-    "vue-axios": "^2.1.4",
-    "vue-svgicon": "^3.2.6"
+    "vue-axios": "^2.1.5",
+    "vue-svgicon": "^3.2.9"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.11.0",
-    "@vue/cli-plugin-eslint": "^3.11.0",
-    "@vue/cli-service": "^3.11.0",
-    "babel-eslint": "^10.0.1",
+    "@vue/cli-plugin-babel": "^3.12.1",
+    "@vue/cli-plugin-eslint": "^3.12.1",
+    "@vue/cli-service": "^3.12.1",
+    "babel-eslint": "^10.1.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10",
-    "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.0"
+    "sass": "^1.56.1",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.7.14"
   },
   "eslintConfig": {
     "root": true,

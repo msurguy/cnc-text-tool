@@ -35,7 +35,7 @@
                 <double-text-input label="Position" first-label="x:" second-label="y:"
                                    :first-value="overlay.x" :second-value="overlay.y" @firstInput="moveOverlayX"
                                    @secondInput="moveOverlayY"></double-text-input>
-                <select-field label="Font" v-model="font.selected"
+                <select-field label="Font" v-model="font.selected" :footerLink="font.originalURL"
                               :options="fontOptions"></select-field>
                 <select-field label="Alignment" v-model="font.alignment"
                               :options="fontAlignmentOptions"></select-field>
@@ -97,7 +97,7 @@
 
   import debounce from 'lodash.debounce'
 
-  const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/svg-fonts/raw/master/fonts/';
+  // const FONT_URL_ROOT = 'https://glcdn.githack.com/oskay/svg-fonts/raw/master/fonts/';
 
   export default {
     name: 'HelloWorld',
@@ -113,6 +113,7 @@
     },
     data () {
       return {
+        publicPath: process.env.publicPath,
         source: {
           filename: '',
           svg: '',
@@ -139,247 +140,358 @@
           'Or use this default SVG as your canvas. \n' +
           'Change font size, font style and more',
         fonts: {
-
+          ReliefRegular: {
+            filename: 'Relief/ReliefSingleLine-Regular',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/isdat-type/Relief-SingleLine'
+          },
           EMSAllure: {
             filename: 'EMS/EMSAllure',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
+          },
+          EMSAllureSmooth: {
+            filename: 'Cutlings/EMS_Allure_Smooth',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
           },
           EMSBird: {
             filename: 'EMS/EMSBird',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSBirdSwashCaps: {
             filename: 'EMS/EMSBirdSwashCaps',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSBrush: {
             filename: 'EMS/EMSBrush',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSCapitol: {
             filename: 'EMS/EMSCapitol',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSCasualHand: {
             filename: 'EMS/EMSCasualHand',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSDecorousScript: {
             filename: 'EMS/EMSDecorousScript',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSDelight: {
             filename: 'EMS/EMSDelight',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSDelightSwashCaps: {
             filename: 'EMS/EMSDelightSwashCaps',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSElfin: {
             filename: 'EMS/EMSElfin',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
+          },
+          EMSElfinSmooth: {
+            filename: 'Cutlings/EMS_Elfin_Smooth',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
           },
           EMSFelix: {
             filename: 'EMS/EMSFelix',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSHerculean: {
             filename: 'EMS/EMSHerculean',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSInvite: {
             filename: 'EMS/EMSInvite',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSLeague: {
             filename: 'EMS/EMSLeague',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSLittlePrincess: {
             filename: 'EMS/EMSLittlePrincess',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSMistyNight: {
             filename: 'EMS/EMSMistyNight',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSNeato: {
             filename: 'EMS/EMSNeato',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSNixish: {
             filename: 'EMS/EMSNixish',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSNixishItalic: {
             filename: 'EMS/EMSNixishItalic',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSOsmotron: {
             filename: 'EMS/EMSOsmotron',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSPancakes: {
             filename: 'EMS/EMSPancakes',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSPepita: {
             filename: 'EMS/EMSPepita',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSQwandry: {
             filename: 'EMS/EMSQwandry',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSReadability: {
             filename: 'EMS/EMSReadability',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSReadabilityItalic: {
             filename: 'EMS/EMSReadabilityItalic',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSSociety: {
             filename: 'EMS/EMSSociety',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSSpaceRocks: {
             filename: 'EMS/EMSSpaceRocks',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSSwiss: {
             filename: 'EMS/EMSSwiss',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           EMSTech: {
             filename: 'EMS/EMSTech',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheyGothEnglish: {
             filename: 'Hershey/HersheyGothEnglish',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheyGothGerman: {
             filename: 'Hershey/HersheyGothGerman',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheyGothItalian: {
             filename: 'Hershey/HersheyGothItalian',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheySans1: {
             filename: 'Hershey/HersheySans1',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheySansMed: {
             filename: 'Hershey/HersheySansMed',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheyScript1: {
             filename: 'Hershey/HersheyScript1',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
+          },
+          HersheyScript1Smooth: {
+            filename: 'Cutlings/HersheyScript1smooth',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
           },
           HersheyScriptMed: {
             filename: 'Hershey/HersheyScriptMed',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheySerifBold: {
             filename: 'Hershey/HersheySerifBold',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheySerifBoldItalic: {
             filename: 'Hershey/HersheySerifBoldItalic',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheySerifMed: {
             filename: 'Hershey/HersheySerifMed',
             data: null,
             string: '',
-            size: 24
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
           HersheySerifMedItalic: {
             filename: 'Hershey/HersheySerifMedItalic',
             data: null,
             string: '',
-            size: 24
-          }
+            size: 24,
+            originalURL: 'https://gitlab.com/oskay/svg-fonts'
+          },
+          ReliefOrnament: {
+            filename: 'Relief/ReliefSingleLineOrnament-Regular',
+            name: 'ReliefOrnament',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/isdat-type/Relief-SingleLine'
+          },
+           CutlingsSingularis: {
+            filename: 'Cutlings/CutlingsSingularis',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
+          },
+           CutlingsDualis: {
+            filename: 'Cutlings/CutlingsDualis',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
+          },
+           CutlingsPluralis: {
+            filename: 'Cutlings/CutlingsPluralis',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
+          },
+           CutlingsGeometric: {
+            filename: 'Cutlings/CutlingsGeometric',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
+          },
+           CutlingsGeometricRound: {
+            filename: 'Cutlings/CutlingsGeometricRound',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'http://cutlings.wasbo.net/products-fonts/'
+          },
+          
         },
         fontOptions: [],
         fontAlignmentOptions: [
@@ -397,7 +509,8 @@
           loading: false,
           strokeWidth: 1,
           widthUnit: 'px',
-          characterSpacing: 0
+          characterSpacing: 0,
+          originalURL: null
         }
       }
     },
@@ -496,10 +609,10 @@
           // try finding "<svg" in the document:
           let fileContents = e.target.result;
 
-          let firstOccurenceOfSVG = fileContents.indexOf('<svg ');
+          let firstOccurenceOfSVG = fileContents.indexOf('<svg');
 
           if (firstOccurenceOfSVG === -1) {
-            firstOccurenceOfSVG = fileContents.indexOf('<SVG ')
+            firstOccurenceOfSVG = fileContents.indexOf('<SVG')
           }
 
           // Remove everything that occurs prior to SVG opening tag
@@ -513,7 +626,7 @@
 
         const svgElement = new DOMParser().parseFromString(fileContents, "image/svg+xml").documentElement;
         // eslint-disable-next-line no-console
-        console.log(svgElement)
+        // console.log(svgElement)
         // Remove classes used in this application
         svgElement.classList.remove("canvas");
 
@@ -575,6 +688,7 @@
         // console.log('loading font')
         const fontMeta = this.fonts[this.font.selected];
         this.font.loading = true;
+        this.font.originalURL = fontMeta.originalURL
         if (fontMeta.data && (this.font.size === fontMeta.size)) {
           this.$nextTick(() => {
             this.font.loading = false
@@ -583,7 +697,7 @@
         }
         if (!fontMeta.data) {
           // Path is retrieved from the font path
-          fontMeta.string = await this.loadFontFromURL(`${FONT_URL_ROOT}${fontMeta.filename}.svg`)
+          fontMeta.string = await this.loadFontFromURL(`/fonts/${fontMeta.filename}.svg`)
         }
         fontMeta.data = parseFont(new DOMParser().parseFromString(fontMeta.string, "image/svg+xml"), this.font.size);
         // console.log(this.font.size)
@@ -595,9 +709,9 @@
       async loadFontFromURL (url) {
         let { data } = await this.axios.get(url);
         // Remove anything before first <svg
-        let firstOccurenceOfSVG = data.indexOf('<svg ');
+        let firstOccurenceOfSVG = data.indexOf('<svg');
         if (firstOccurenceOfSVG === -1) {
-          firstOccurenceOfSVG = data.indexOf('<SVG ')
+          firstOccurenceOfSVG = data.indexOf('<SVG')
         }
 
         // Remove everything that occurs prior to SVG opening tag

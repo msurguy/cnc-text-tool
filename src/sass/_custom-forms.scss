@@ -7,6 +7,8 @@
 //
 // Base class takes care of all the key behavioral aspects.
 
+@use "sass:list";
+
 .custom-control {
   position: relative;
   display: block;
@@ -74,7 +76,7 @@
   // Background-color and (when enabled) gradient
   &::before {
     position: absolute;
-    top: ($font-size-base * $line-height-base - $custom-control-indicator-size) / 2;
+    top: ($font-size-base * $line-height-base - $custom-control-indicator-size) * 0.5;
     left: -($custom-control-gutter + $custom-control-indicator-size);
     display: block;
     width: $custom-control-indicator-size;
@@ -89,13 +91,13 @@
   // Foreground (icon)
   &::after {
     position: absolute;
-    top: ($font-size-base * $line-height-base - $custom-control-indicator-size) / 2;
+    top: ($font-size-base * $line-height-base - $custom-control-indicator-size) * 0.5;
     left: -($custom-control-gutter + $custom-control-indicator-size);
     display: block;
     width: $custom-control-indicator-size;
     height: $custom-control-indicator-size;
     content: "";
-    background: no-repeat 50% / #{$custom-control-indicator-bg-size};
+    background: no-repeat list.slash(50%, $custom-control-indicator-bg-size);
   }
 }
 
@@ -179,7 +181,7 @@
     }
 
     &::after {
-      top: calc(#{(($font-size-base * $line-height-base - $custom-control-indicator-size) / 2)} + #{$custom-control-indicator-border-width * 2});
+      top: calc(#{(($font-size-base * $line-height-base - $custom-control-indicator-size) * 0.5)} + #{$custom-control-indicator-border-width * 2});
       left: calc(#{-($custom-switch-width + $custom-control-gutter)} + #{$custom-control-indicator-border-width * 2});
       width: $custom-switch-indicator-size;
       height: $custom-switch-indicator-size;
@@ -400,7 +402,7 @@
   &::-webkit-slider-thumb {
     width: $custom-range-thumb-width;
     height: $custom-range-thumb-height;
-    margin-top: ($custom-range-track-height - $custom-range-thumb-height) / 2; // Webkit specific
+    margin-top: ($custom-range-track-height - $custom-range-thumb-height) * 0.5; // Webkit specific
     @include gradient-bg($custom-range-thumb-bg);
     border: $custom-range-thumb-border;
     border-radius: ($custom-range-thumb-border-radius);
@@ -475,7 +477,7 @@
     cursor: $custom-range-track-cursor;
     background-color: transparent;
     border-color: transparent;
-    border-width: $custom-range-thumb-height / 2;
+    border-width: $custom-range-thumb-height * 0.5;
     @include box-shadow($custom-range-track-box-shadow);
   }
 
@@ -558,6 +560,14 @@
       &:hover {
         color: white;
       }
+    }
+  }
+
+  .control-footer {
+    margin-top: 10px;
+    font-size: 14px;
+    a {
+      color: $gray-500;
     }
   }
 

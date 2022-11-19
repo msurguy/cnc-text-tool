@@ -26,6 +26,9 @@
         </option>
       </select>
     </div>
+    <div class="control-footer" v-if="footerLink">
+      <a :href="footerLink" target="_blank">About this font</a>
+    </div>
   </div>
 </template>
 
@@ -40,6 +43,9 @@ export default {
     },
     rightIcon: {
       type: Object
+    },
+    footerLink: {
+      type: String
     },
     label: {
       type: String,
