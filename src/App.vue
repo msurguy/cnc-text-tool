@@ -364,6 +364,13 @@
             size: 24,
             originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
+          "HersheyAstrology": {
+            filename: 'Hershey/HersheyAstrology',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
           HersheyGothEnglish: {
             filename: 'Hershey/HersheyGothEnglish',
             data: null,
@@ -448,6 +455,91 @@
             size: 24,
             originalURL: 'https://gitlab.com/oskay/svg-fonts'
           },
+          
+          "HersheyCyrillic": {
+            filename: 'Hershey/HersheyCyrillic',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyGreek-1-stroke": {
+            filename: 'Hershey/HersheyGreek1stroke',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyGreekmedium": {
+            filename: 'Hershey/HersheyGreekmedium',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyJapanese": {
+            filename: 'Hershey/HersheyJapanese',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyMarkers": {
+            filename: 'Hershey/HersheyMarkers',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyMath(lower)": {
+            filename: 'Hershey/HersheyMath(lower)',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyMath(upper)": {
+            filename: 'Hershey/HersheyMath(upper)',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyMeteorology": {
+            filename: 'Hershey/HersheyMeteorology',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyMusic": {
+            filename: 'Hershey/HersheyMusic',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheySansbold": {
+            filename: 'Hershey/HersheySansbold',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheyScript-1-stroke(alt)": {
+            filename: 'Hershey/HersheyScript1-stroke(alt)',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          "HersheySymbolic": {
+            filename: 'Hershey/HersheySymbolic',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
           ReliefOrnament: {
             filename: 'Relief/ReliefSingleLineOrnament-Regular',
             name: 'ReliefOrnament',
@@ -491,7 +583,28 @@
             size: 24,
             originalURL: 'http://cutlings.wasbo.net/products-fonts/'
           },
-          
+          ShriinivasCustom: {
+            filename: 'Shriinivas/Custom-Script',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+          ShriinivasSquareItalic: {
+            filename: 'Shriinivas/Custom-SquareItalic',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+           ShriinivasSquareNormal: {
+            filename: 'Shriinivas/Custom-SquareNormal',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/Shriinivas/inkscapestrokefont'
+          },
+      
         },
         fontOptions: [],
         fontAlignmentOptions: [
@@ -566,7 +679,7 @@
         this.overlay.y = e.detail.box.y
       });
 
-      this.fontOptions = Object.keys(this.fonts).map((fontName) => {
+      this.fontOptions = Object.keys(this.fonts).sort().map((fontName) => {
         return { text: fontName, value: fontName }
       });
 
