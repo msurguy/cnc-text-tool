@@ -60,6 +60,11 @@
 
       <!-- Page Content -->
       <div class="paper">
+        <div class="ad">
+          <a href="https://shop.evilmadscientist.com/directory"
+            target="_blank" style="color:inherit;">Get 10% off AxiDraw and accessories with affiliate coupon
+            "<b>PLOTTER</b>"</a>
+          </div>
         <div id="sketch" class="sketch">
           <div id="svg-wrapper" ref="svgWrapper">
           </div>
@@ -928,6 +933,21 @@
 
 <style>
 
+ .ad {
+        display: flex;
+        align-items: center;
+        padding: .365625rem 1.25rem;
+        font-size: .875rem;
+        line-height: 1.4;
+        border: 1px solid #eaeaea;
+        position: relative;
+        text-align: center;
+        justify-content: center;
+        border-color: #666;
+        background-color: #666;
+        color: #fff;
+      }
+
   #app {
     height: 100%;
   }
@@ -976,7 +996,6 @@
   }
 
   .paper {
-    padding: 10px;
     background-color: #dedede;
     position: relative;
     max-height: 100vh;
@@ -986,6 +1005,8 @@
   }
 
   .sketch {
+        padding: 10px;
+
     position: relative;
     /*overflow: auto;*/
   }
@@ -1029,6 +1050,7 @@
     }
 
     .paper {
+      min-height: 100%;
       width: 100%;
       max-height: none;
     }
