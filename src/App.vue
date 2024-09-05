@@ -144,6 +144,13 @@
           'Or use this default SVG as your canvas. \n' +
           'Change font size, font style and more',
         fonts: {
+          RoutedGothic: {
+            filename: 'RoutedGothic',
+            data: null,
+            string: '',
+            size: 24,
+            originalURL: 'https://github.com/dse/routed-gothic'
+          },
           ReliefRegular: {
             filename: 'Relief/ReliefSingleLine-Regular',
             data: null,
