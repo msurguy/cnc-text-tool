@@ -60,10 +60,10 @@
 
       <!-- Page Content -->
       <div class="paper">
-        <!-- <div class="ad">
+        <div class="ad">
           <a href="https://store.bantamtools.com/collections/bantam-tools-nextdraw"
-            target="_blank" style="color:inherit;">Get 5% off NextDraw and accessories with coupon "<b>DRAWINGBOT2024</b>"</a>
-          </div> -->
+            target="_blank" style="color:inherit;">Get 5% off NextDraw and accessories with coupon "<b>DRAWINGBOT2025</b>"</a>
+          </div>
         <div id="sketch" class="sketch">
           <div id="svg-wrapper" ref="svgWrapper">
           </div>
