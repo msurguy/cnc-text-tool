@@ -1,6 +1,8 @@
 # CNC Single‑Line Text Tool
 
-[Open the tool](https://msurguy.github.io/cnc-text-tool/) — design clean, single‑stroke text for pen plotters, laser engravers, and CNC machines right in your browser.
+> **This tool has moved!** It's now called **Plotter Text** and is hosted at **[drawingbots.com/tools/plotter-text](https://drawingbots.com/tools/plotter-text/)**. The old GitHub Pages URL (`msurguy.github.io/cnc-text-tool`) now shows a notice and redirects there — `docs/index.html` in this repo is that redirect page, not the app. Rebuilding with `npm run build` would overwrite it with the old app, so don't rebuild unless you intend to undo the redirect.
+
+[Open the tool](https://drawingbots.com/tools/plotter-text/) — design clean, single‑stroke text for pen plotters, laser engravers, and CNC machines right in your browser.
 
 This app lets you lay out multi‑line, single‑line (Hershey/engraving) text on top of an SVG, tweak spacing and alignment, and export a ready‑to‑cut SVG. No installs, no sign‑ups — everything runs locally in your browser.
 
